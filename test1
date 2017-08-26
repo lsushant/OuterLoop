@@ -1,0 +1,2751 @@
+define(['app','directives/validNumber','directives/resizable'
+], function(app) {
+    'use strict';
+
+    app.controller('brqController', ['$rootScope', '$scope', '$state', '$http','APPCONSTANTS','Quad3SingleEditService','MasterDataService','$timeout','$interval',
+	    function($rootScope, $scope, $state, $http, APPCONSTANTS,Quad3SingleEditService,MasterDataService,$timeout,$interval) {
+
+    	// brq fields start
+        $scope.notesId = "";
+        $scope.firstName = "";
+        $scope.lastName = "";
+        $scope.actHeadCount = "";
+        $scope.dateRole;
+        $scope.functMgr;
+        $scope.jobResponsibilites;
+        $scope.globMgr;
+        $scope.comments;
+        $scope.hriwlabel;
+        $scope.hriwtxt;
+      	// brq fields end
+       // hriw fields start
+        $scope.physicalLocationIMT = "";
+        $scope.physicalLocationIOT = "";
+        $scope.isManager;
+        // hriw fields end
+        $scope.insertSelectedFundingBU;
+        $scope.insertSelectedBeneficiaryBU;
+        $scope.insertSelectedBeneficiarySubBrand;
+        $scope.insertSelectedMission;
+        $scope.insertSelectedBeneficiary;
+        $scope.insertSelectedBeneficiryIOT;
+        $scope.insertSelectedBeneficiaryIMT;
+        $scope.insertSelectedRegion;
+        $scope.insertSelectedBeneficiaryCountry;
+        $scope.insertSelectedDiscipline;
+        $scope.insertSelectedJobrole;
+        $scope.insertSelectedJobroeSpecialities;
+        $scope.insertSelectedProgram;
+        $scope.insertSelectedFunBudDplmnt;
+        $scope.insertSelectedIcafunded;
+        $scope.insertSelectedGroup;
+        $scope.insertSelectedDepDateFrmRole;
+        
+        $scope.insertSelectedMission;
+        $scope.insertSelectedBeneficiryIOT;
+        $scope.FTEPerRole = "";
+        $scope.yearQtrLb;
+        $scope.brandprevpart1 = $scope.brandprevpart2 = $scope.brandprevpart3 = $scope.brandprevpart4 = undefined;
+        $scope.monthPrev =  $scope.yearPrev =  undefined;
+        
+        //BRQ SINGLE SELECTION EDIT FIELDS
+        $scope.multiRoleAC = [];	
+        $scope.isManagerComb;
+        $scope.isMgr_HriwText;
+        $scope.isMgr_HriwId;
+        $scope.hriwEmpType = "";
+        $scope.hriwEmpType_Id;
+        $scope.physicalLocationIOT_Id;
+        $scope.physicalLocationIMT_Id;
+        $scope.countryOfResidence = "";
+        $scope.countryOfResidence_Id;
+        $scope.feedDate;
+        $scope.isHriwFeedComp;
+        $scope.isHriwFeedLabel;
+        
+        $scope.hriwAccMgr = "";
+        $scope.hriwjobcatCodeName = "";
+        $scope.hriwaccdept = "";
+        $scope.hriwintranetId = "";
+        $scope.hriwBPworklocCode = "";
+        $scope.hriwFinacialQualifier = "";
+        $scope.hriwCountryNum = "";
+        $scope.hriwRepMgr = "";
+        $scope.hriwBpworkplaceInd = "";
+        $scope.hriwWorkperiodScheduled = "";
+        $scope.hriwSerialNum = "";
+        $scope.indRmpyrates = "";
+        $scope.statusOverlayMsg;
+        
+        $scope.notesvaloverlaygridoptions = {resizable: true};
+        $scope.notesvaloverlaygridoptions.columnDefs = [];
+        $scope.secondQuadData;
+        $scope.levelone=false;
+        $scope.fundingBUToggled = "true";
+        $scope.multiplesFundingBU = [];
+        $scope.multipleBeneficiaryBU = [];
+        $scope.multipleBeneficiarySubBrand = [];
+        $scope.multiplesMission = [];
+        $scope.newMultiplesBeneficiary = [];
+        $scope.multipleBeneficiaryIOT = [];
+        $scope.multipleBeneficiaryIMT = [];
+        $scope.multipleRegion = [];
+        $scope.multipleBeneficiaryCountry = [];
+        $scope.multipleDisciplineVertical = [];
+        $scope.multipleJobRole = [];
+        $scope.multipleJobroleSpecialities = [];
+        $scope.multipleprogram = [];
+        $scope.multiplesFundingLevelBudgetDeployment = [];
+        $scope.multiplesIcaFunded = [];
+        $scope.singleSelValStmt = "";
+        
+        //Individual section
+        $scope.rmcityFlag = true;
+        $scope.rmlocFlag = true;
+        $scope.rmshiftFlag = true;
+        $scope.rmbillingtypeFlag = true;
+       //Notes validation variables
+        $scope.notesvalDbFlag;
+        $scope.notesvalNotesId;
+        $scope.notesvalDbmsg;
+        $scope.notesvalFirstName;
+        $scope.notesvalLastName;
+        $scope.notesvalFuncMgr;
+        $scope.notesvalJobResp;
+        $scope.notesvalIsmgr;
+        $scope.notesvalCountryRes;
+        $scope.notesvalCountryNum;
+        $scope.notesvalSerno;
+        $scope.notesvalReprMgr;
+        $scope.notesvalIntranetId;
+        $scope.notesvalBpworklocCode;
+        $scope.notesvalBpworkIndicator;
+        $scope.notesvalGridDetails = [];
+       //End Notes validation variables
+      
+        $scope.functionalMgrNotesId;
+        $scope.functionalMgrfirstName;
+        $scope.functionalMgrlastName;
+        $scope.functionalMgrbbFlag;
+        
+        $scope.isMarkedDeparted = false;
+		$scope.isMarkedTransfer = false;
+		$scope.isMarkedTransferOutside = false;
+		$scope.isUpdateStatus = false;
+		$scope.isMarkedDelete = false;
+		$scope.selectedXferTypeId = "";
+		$scope.selectedXferTypeLabel = "";
+		$scope.isTLYesNoAc = [];
+		$scope.isTLYesNoAc = [];
+		$scope.isNotesValFlag = false;
+		$scope.isRmOnly;
+		$scope.isSuperUser;
+		$scope.isNotesValFlag;
+		//$scope.showAlertMsg = "";
+		$scope.showAlertMsg_brq = "";
+		
+		$scope.mode;
+		
+		$scope.quad3mastervalsLoaded=false;
+		
+		$scope.changeHistory = "";
+		$scope.year = "";
+		$scope.month = "";
+		
+		$scope.indRMynFlag = false;
+		
+		if(!$rootScope.$$listenerCount['quad3editvalues']){
+	          $rootScope.$on("quad3editvalues", function(event, reload) {
+	          	if (!$scope.quad3mastervalsLoaded){
+	          		$scope.quad3mastervalsLoaded=true;
+	        	    $scope.quad3MasterData();
+	          	}
+	        	    $scope.loadQuad3Data();
+	           });
+	      };
+	      
+	      if(!$rootScope.$$listenerCount['quad3copyvalues']){
+	          $rootScope.$on("quad3copyvalues", function(event, reload) {
+	          	if (!$scope.quad3mastervalsLoaded){
+	          		$scope.quad3mastervalsLoaded=true;
+	        	    $scope.quad3MasterData();
+	          	}
+	        	    $scope.loadCopyRecordData();
+	           });
+	      };
+	      
+	      if(!$rootScope.$$listenerCount['resetAllQuad3']){
+	          $rootScope.$on("resetAllQuad3", function(event, reload) {
+	        	 // $scope.clearScreen();
+	          	 $("#bottomRightQuad").hide();
+	           });
+	      };
+	    /*
+	     * brq single edit and copy record master data (dropdown data)
+	     */  
+	    $scope.quad3MasterData = function(){
+	    	console.log("quad3Master data function...");
+	    	 $("#loader").css("display","block"); 
+	     	  var dropdownReq = {
+	    			    method: 'POST',
+	    			    url: './sendflexrequest?action=3rdQuadrant&servletAction=initAddNewResource&doCompress=false',
+	    			    headers: {
+	    			        'Content-Type': 'application/json'
+	    			    },
+	    			    'dataType': 'json'
+	    	  };
+	     	 $http(dropdownReq).then(function (response) {
+	     		if (response.data.notAuthorized == undefined || response.data.notAuthorized == "true") {
+	     			$("#loader").css("display","block"); 
+					alert(APPCONSTANTS.SESSION_EXPIRED);
+					var url = window.location.href;
+					var arr = url.split("/");
+					url = arr[0]+"//"+arr[2];
+					$(location).attr('href', url + "/sales/gss/mnc");
+					return;
+				} 
+			    var dropdownRes = response.data;
+			    $scope.deptReason = $scope.brqDropdownSet(dropdownRes.departureReason);
+			    $scope.empType = $scope.brqDropdownSet(dropdownRes.employeeType);
+			    $scope.empTypePlan = $scope.brqDropdownSet(dropdownRes.employeeTypePlan);
+			    $scope.fundingSource = $scope.brqDropdownSet(dropdownRes.fundingSource);
+			    $scope.hiringOrg = $scope.brqDropdownSet(dropdownRes.hiringOrg);
+			    $scope.indGroup = $scope.brqDropdownSet(dropdownRes.indGroup);
+			    $scope.isExecYesNo = $scope.brqDropdownSet(dropdownRes.isExecYesNo); 
+			    $scope.isManagerComb1 = $scope.brqDropdownSet(dropdownRes.isManager); 
+			    $scope.isManagerComb = [];
+			    for(var i=0; i<$scope.isManagerComb1.length; i++){
+			    	var obj = {};
+			    	if($scope.isManagerComb1[i].lv_id == "385" || $scope.isManagerComb1[i].lv_id == "386"){
+			    		obj = $scope.isManagerComb1[i];
+				    	$scope.isManagerComb.push(obj);
+			    	}
+			    }
+			    $scope.isTLYesNo = $scope.brqDropdownSet(dropdownRes.isTLYesNo);
+			    $scope.phylocIot = $scope.hriwphysicalLociot = $scope.brqDropdownSet(dropdownRes.physicalLocationIot);
+			    
+			    $scope.primaryJobCat = $scope.brqDropdownSet(dropdownRes.primaryJobCategory);
+			    $scope.rmBillingType = $scope.brqDropdownSet(dropdownRes.rmBillingType);
+			    $scope.rmCity = $scope.brqDropdownSet(dropdownRes.rmCity);
+			    $scope.rmLocation = $scope.brqDropdownSet(dropdownRes.rmLocation);
+			    $scope.rmShift = $scope.brqDropdownSet(dropdownRes.rmShift);
+			    $scope.rmYesNo = $scope.brqDropdownSet(dropdownRes.rmYesNo);
+			    $scope.status = $scope.brqDropdownSet(dropdownRes.status);
+			    $scope.vertical = $scope.brqDropdownSet(dropdownRes.vertical);
+			    
+			    $scope.multiplesBeneficiary = $scope.brqDropdownSet(response.data.multiples.beneficiary);
+			    $scope.multiplesCategory = $scope.brqDropdownSet(response.data.multiples.category);
+			    $scope.multiplesFundingBU = $scope.brqDropdownSet(response.data.multiples.fundingBU);
+			    $scope.multiplesFundingLevelBudgetDeployment = $scope.brqDropdownSet(response.data.multiples.fundingLevelBudgetDeployment);
+			    $scope.multiplesGrowthPlay = $scope.brqDropdownSet(response.data.multiples.growthPlay);
+			    $scope.multiplesIcaFunded = $scope.brqDropdownSet(response.data.multiples.icaFunded);
+			    $scope.multiplesMission = $scope.brqDropdownSet(response.data.multiples.mission);
+			    $scope.multipleDisciplineVertical = $scope.brqDropdownSet(response.data.vertical);
+			}, function (response) {
+				console.log("Failure function111");
+			});
+	    };  
+    	
+	    /*
+	     * brq sigle selection edit to populate the data on the UI
+	     */
+    	$scope.loadQuad3Data = function(){
+    		console.log("loadQuad3Data....");
+    		var resourceID = Quad3SingleEditService.resourceID;
+	     	var endDate = Quad3SingleEditService.endDate;
+	     	var feedDate = Quad3SingleEditService.feedDate;
+	     	$scope.feedDate = feedDate;
+	     	   if(feedDate != null && feedDate != "-" ){
+	     		   $scope.hriwlabel = true;
+	     		   $scope.hriwtxt = false;
+	     		   $scope.isHriwFeedComp = false;
+	     		   $scope.isHriwFeedLabel = true;
+	     		   //$scope.hriwFlag = true;
+	     	   }else{
+	     		   $scope.hriwlabel = false;
+	     		   $scope.hriwtxt = true;
+	     		   $scope.isHriwFeedComp = true;
+	     		   $scope.isHriwFeedLabel = false;
+	     		   //$scope.hriwFlag = false;
+	     	   }
+	     	   var req = {
+	    			    method: 'POST',
+	    			    url: './sendflexrequest?action=3rdQuadrant&servletAction=retrieveResourceInfo&resourceID='+resourceID+'&endDate='+endDate+'&doCompress=false',
+	    			    headers: {
+	    			        'Content-Type': 'application/json'
+	    			    },
+	    			    'dataType': 'json'
+	    			};
+	    			$http(req).then(function (response) {
+	    				if (response.data.notAuthorized == undefined || response.data.notAuthorized == "true") {
+	    					$("#loader").css("display","block"); 
+							alert(APPCONSTANTS.SESSION_EXPIRED);
+							var url = window.location.href;
+							var arr = url.split("/");
+							url = arr[0]+"//"+arr[2];
+							$(location).attr('href', url + "/sales/gss/mnc");
+							return;
+						} 
+	    			    $scope.brqSingleSelectionResponse = response;
+	    			 	$scope.notesId = response.data.resourceMaster.resourceDetail.NOTES_ID;
+	    			 	$scope.firstName = response.data.resourceMaster.resourceDetail.FIRST_NAME;
+	    			 	$scope.lastName = response.data.resourceMaster.resourceDetail.LAST_NAME;
+	    			 	$scope.actHeadCount = response.data.resourceMaster.resourceDetail.ACTUAL;
+	    			 	$scope.dateRole = response.data.resourceMaster.resourceDetail.DATE_IN_THIS_ROLE;
+	    			 	$scope.functMgr = response.data.resourceMaster.resourceDetail.FUNCTIONAL_MANAGER;
+	    			 	$scope.jobResponsibilites = response.data.resourceMaster.resourceDetail.JOB_RESPONSIBILITIES;
+	    			 	$scope.globMgr = response.data.resourceMaster.resourceDetail.GLOBAL_MANAGER;
+	    			 	$scope.comments = response.data.resourceMaster.resourceDetail.COMMENTS;
+	    			    //start hriw fields
+	    			 	//$scope.physicalLocationIMT = $scope.physicalLocIMTs(response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_IOT,response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_IMT);
+	    			 	
+	    			 	$scope.physicalLocationIMT_Id = response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_IMT;
+	    			 	
+	    			 	$scope.physicalLocIMTs(response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_IOT,response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_IMT);
+	    			 	
+	    			 	$scope.hriwphysicalLocImt = response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_IMT;
+	    			 	
+	    			 	$scope.physicalLocationIOT_Id = response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_IOT;
+	    			 	$scope.hriwPhysicalLocIot = response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_IOT;
+	    			 	
+	    			 	
+	    			 	$scope.physicalLocationIOT = $scope.getPhysicalLocIOT(response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_IOT);
+			    	    $scope.hriwjobcatCodeName = response.data.resourceMaster.resourceDetail.JOB_CATEGORY_CODE_OR_NAME;
+			    	    //$scope.isManager = response.data.resourceMaster.resourceDetail.IS_MANAGER;
+			    	    
+			    	    $scope.ismgrId = $scope.hriwIsmgr = response.data.resourceMaster.resourceDetail.IS_MANAGER;
+			    	    $scope.ismgrDesc;
+			    	    
+						for(var j = 0; j < $scope.isManagerComb.length; j++ ){
+							if($scope.isManagerComb[j].lv_id == $scope.ismgrId){
+					    	    $scope.ismgrDesc = $scope.isManagerComb[j].lv_desc;
+								if($scope.isHriwFeedComp){
+									 //botRight.IsManagerCb.selectedIndex = j;	
+								 }else{
+									 $scope.isManager = $scope.isManagerComb[j].lv_desc;
+								     $scope.isMgr_HriwText = $scope.isManagerComb[j].lv_desc;
+								     $scope.isMgr_HriwId = $scope.isManagerComb[j].lv_id;
+								 }
+									break;
+								}else if($scope.ismgrId == "386"){
+									$scope.isManager = "Non-Mgr";	
+									$scope.isMgr_HriwText = "Non-Mgr";
+									$scope.isMgr_HriwId = "386";
+									break;
+								}
+						}
+			    	    
+			    	    $scope.hriwintranetId = response.data.resourceMaster.resourceDetail.INTRANET_ID;
+			    	    $scope.hriwCountryNum = response.data.resourceMaster.resourceDetail.COUNTRY_NUMBER;
+			    	    $scope.hriwBpworkplaceInd = response.data.resourceMaster.resourceDetail.BP_WORKPLACE_INDICATOR;
+			    	    $scope.hriwBPworklocCode = response.data.resourceMaster.resourceDetail.BP_WORK_LOCATION_CODE;
+			    		$scope.hriwSerialNum = response.data.resourceMaster.SERIAL_NUMBER;
+			    		$scope.hriwRepMgr = response.data.resourceMaster.resourceDetail.PEOPLE_MANAGER;
+			    		
+			    		if(response.data.resourceMaster.resourceDetail.ACCOUNT_FINANCIAL_QUALIFIER.search('&') != -1){
+			    			$scope.hriwFinacialQualifier = response.data.resourceMaster.resourceDetail.ACCOUNT_FINANCIAL_QUALIFIER.replace(/&/g, "");
+			    		}else{
+			    			$scope.hriwFinacialQualifier = response.data.resourceMaster.resourceDetail.ACCOUNT_FINANCIAL_QUALIFIER;
+			    		}
+			    		
+			    		$scope.hriwaccdept = response.data.resourceMaster.resourceDetail.CHARGE_TO_ACCOUNT;
+			    		$scope.hriwAccMgr = response.data.resourceMaster.resourceDetail.ACCOUNT_MAJOR;
+			    		$scope.hriwWorkperiodScheduled = response.data.resourceMaster.resourceDetail.WORK_PERIOD_SCHEDULED;
+			    		
+			    		$scope.hriwEmpType_Id = $scope.hriwemptype = response.data.resourceMaster.resourceDetail.LV_RESOURCE_TYPE;
+			    		$scope.hriwEmpType = $scope.getEmpType(response.data.resourceMaster.resourceDetail.LV_RESOURCE_TYPE);
+			    	    $scope.physicalLocationCountryNum = response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_COUNTRY;
+			    		$scope.countryOfResidence_Id = response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_COUNTRY;
+			    		$scope.hriwCountryRes = response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_COUNTRY;
+			    	    $scope.loadCountrResdatafromPhyIMT(response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_IMT,$scope.physicalLocationCountryNum);
+			    		// End hriw section
+			    		//Individual dropdown setting start
+			    		$scope.selectedPrimjobcat = response.data.resourceMaster.resourceDetail.LV_PRIMARY_JOB_CATEGORY;
+			    		$scope.selectedFundSrc = response.data.resourceMaster.resourceDetail.LV_FUNDING_SOURCE;
+			    		$scope.selectedStatus = response.data.resourceMaster.resourceDetail.LV_STATUS;
+			    		$scope.initialStatus = response.data.resourceMaster.resourceDetail.LV_STATUS;
+			    		$scope.unDeleteStatus = response.data.resourceMaster.resourceDetail.LV_STATUS;
+			    		
+			    		$scope.selecteddeptReason = response.data.resourceMaster.resourceDetail.LV_DEPARTURE_REASON;
+			    		$scope.selectedHiringOrg = response.data.resourceMaster.resourceDetail.LV_HIRING_ORGANISATION;
+			    		$scope.selectedExec = response.data.resourceMaster.resourceDetail.IS_EXEC;
+			    		$scope.selectedTl = response.data.resourceMaster.resourceDetail.IS_TL;
+			    		$scope.selectedRmyn = response.data.resourceMaster.resourceDetail.LV_RM;
+			    		
+			    		$scope.selectedRmcity = response.data.resourceMaster.resourceDetail.LV_RM_CITY;
+			    		$scope.selectedRmloc = response.data.resourceMaster.resourceDetail.LV_RM_LOCATION;
+			    		$scope.selectedRmshift = response.data.resourceMaster.resourceDetail.LV_RM_SHIFT;
+			    		$scope.selectedRmbilltype = response.data.resourceMaster.resourceDetail.LV_RM_BILLING;
+			    		
+			    		$scope.selectedIndgroup = response.data.resourceMaster.IND_GRP;
+			    		//Individual dropdown setting end
+			    		//Multiple section values start
+			    		$scope.multipleSectionGrid(response.data.resourceMaster.resourceDetail.rsrcBrndVrtclMaps);
+			    		//Multiple section values end
+			    		
+			    		$scope.changeHistory = response.data.resourceMaster.resourceDetail.CHANGE_HISTORY;
+			    		$scope.year = response.data.resourceMaster.resourceDetail.YEAR;
+			    		$scope.month = response.data.resourceMaster.resourceDetail.MONTH;
+			    		
+			    		$scope.indRMynChangeEvent();
+			    		
+			    		$("#loader").css("display","none"); 
+	    			}, function (response) {
+	    				console.log("Failure function");
+	    				$("#loader").css("display","none"); 
+	    			});
+    	};
+    	
+    	/*
+    	 * brq copy record view
+    	 */
+    	$scope.loadCopyRecordData = function(){
+    		console.log("loadCopy record data..");
+    		var resourceID = Quad3SingleEditService.resourceID;
+	     	//var endDate = Quad3SingleEditService.endDate;
+	     	//var feedDate = Quad3SingleEditService.feedDate;
+	     	/*$scope.feedDate = feedDate;
+	     	   if(feedDate != null && feedDate != "-" ){
+	     		   $scope.hriwlabel = true;
+	     		   $scope.hriwtxt = false;
+	     		   $scope.isHriwFeedComp = false;
+	     		   $scope.isHriwFeedLabel = true;
+	     		   //$scope.hriwFlag = true;
+	     	   }else{*/
+	     		   $scope.hriwlabel = false;
+	     		   $scope.hriwtxt = true;
+	     		   $scope.isHriwFeedComp = true;
+	     		   $scope.isHriwFeedLabel = false;
+	     		   //$scope.hriwFlag = false;
+	     	  // }
+	     	   var req = {
+	    			    method: 'POST',
+	    			    url: './sendflexrequest?action=3rdQuadrant&servletAction=retrieveResourceInfo&resourceID='+resourceID+'&doCompress=false',
+	    			    headers: {
+	    			        'Content-Type': 'application/json'
+	    			    },
+	    			    'dataType': 'json'
+	    			};
+	    			$http(req).then(function (response) {
+	    			    console.log("second quadrant onclick response");
+	    			    console.log(response);
+	    			    $scope.brqSingleSelectionResponse = response;
+	    			 	$scope.notesId = "";
+	    			 	$scope.firstName = "";
+	    			 	$scope.lastName = "";
+	    			 	$scope.actHeadCount = "";
+	    			 	$scope.dateRole = "";
+	    			 	$scope.functMgr = "";
+	    			 	$scope.jobResponsibilites = "";
+	    			 	$scope.globMgr = "";
+	    			 	$scope.comments = "";
+	    			    //start hriw fields
+	    			 	//$scope.physicalLocationIMT = $scope.physicalLocIMTs(response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_IOT,response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_IMT);
+	    			 	
+	    			 	$scope.physicalLocationIMT_Id = response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_IMT;
+	    			 	
+	    			 	$scope.physicalLocIMTs(response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_IOT,response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_IMT);
+	    			 	
+	    			 	//$scope.hriwphysicalLocImt = response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_IMT;
+	    			 	
+	    			 	$scope.physicalLocationIOT_Id = response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_IOT;
+	    			 //	$scope.hriwPhysicalLocIot = response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_IOT;
+	    			 	
+	    			 	$scope.physicalLocationIOT = $scope.getPhysicalLocIOT(response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_IOT);
+			    	    $scope.hriwjobcatCodeName = "";
+			    	    //$scope.isManager = response.data.resourceMaster.resourceDetail.IS_MANAGER;
+			    	    
+			    	    $scope.ismgrId = $scope.hriwIsmgr = response.data.resourceMaster.resourceDetail.IS_MANAGER;
+			    	    
+						for(var j = 0; j < $scope.isManagerComb.length; j++ ){
+							if($scope.isManagerComb[j].lv_id == $scope.ismgrId){
+								if($scope.isHriwFeedComp){
+									 //botRight.IsManagerCb.selectedIndex = j;	
+								 }else{
+									 $scope.isManager = $scope.isManagerComb[j].lv_desc;
+								     $scope.isMgr_HriwText = $scope.isManagerComb[j].lv_desc;
+								     $scope.isMgr_HriwId = $scope.isManagerComb[j].lv_id;
+								 }
+									break;
+								}else if($scope.ismgrId == "386"){
+									$scope.isManager = "Non-Mgr";	
+									$scope.isMgr_HriwText = "Non-Mgr";
+									$scope.isMgr_HriwId = "386";
+									break;
+								}
+						}
+			    	    
+			    	    $scope.hriwintranetId = "";
+			    	    $scope.hriwCountryNum = "";
+			    	    $scope.hriwBpworkplaceInd = "";
+			    	    $scope.hriwBPworklocCode = "";
+			    		$scope.hriwSerialNum = "";
+			    		$scope.hriwRepMgr = "";
+			    		$scope.hriwFinacialQualifier = "";
+			    		$scope.hriwaccdept = "";
+			    		$scope.hriwAccMgr = "";
+			    		$scope.hriwWorkperiodScheduled = "";
+			    		
+			    		$scope.hriwEmpType_Id = $scope.hriwemptype = response.data.resourceMaster.resourceDetail.LV_RESOURCE_TYPE;
+			    		$scope.hriwEmpType = $scope.getEmpType(response.data.resourceMaster.resourceDetail.LV_RESOURCE_TYPE);
+			    	    $scope.physicalLocationCountryNum = response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_COUNTRY;
+			    		$scope.countryOfResidence_Id = response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_COUNTRY;
+			    	//	$scope.hriwCountryRes = response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_COUNTRY;
+			    	    $scope.loadCountrResdatafromPhyIMT(response.data.resourceMaster.resourceDetail.physicalLocationMap.PHYSICAL_LOCATION_IMT,$scope.physicalLocationCountryNum);
+			    		// End hriw section
+			    		//Individual dropdown setting start
+			    		$scope.selectedPrimjobcat = response.data.resourceMaster.resourceDetail.LV_PRIMARY_JOB_CATEGORY;
+			    		$scope.selectedFundSrc = response.data.resourceMaster.resourceDetail.LV_FUNDING_SOURCE;
+			    		$scope.selectedStatus = response.data.resourceMaster.resourceDetail.LV_STATUS;
+			    		$scope.initialStatus = response.data.resourceMaster.resourceDetail.LV_STATUS;
+			    		$scope.unDeleteStatus = response.data.resourceMaster.resourceDetail.LV_STATUS;
+			    		
+			    		$scope.selecteddeptReason = response.data.resourceMaster.resourceDetail.LV_DEPARTURE_REASON;
+			    		$scope.selectedHiringOrg = response.data.resourceMaster.resourceDetail.LV_HIRING_ORGANISATION;
+			    		$scope.selectedExec = response.data.resourceMaster.resourceDetail.IS_EXEC;
+			    		$scope.selectedTl = response.data.resourceMaster.resourceDetail.IS_TL;
+			    		$scope.selectedRmyn = response.data.resourceMaster.resourceDetail.LV_RM;
+			    		
+			    		$scope.selectedRmcity = response.data.resourceMaster.resourceDetail.LV_RM_CITY;
+			    		$scope.selectedRmloc = response.data.resourceMaster.resourceDetail.LV_RM_LOCATION;
+			    		$scope.selectedRmshift = response.data.resourceMaster.resourceDetail.LV_RM_SHIFT;
+			    		$scope.selectedRmbilltype = response.data.resourceMaster.resourceDetail.LV_RM_BILLING;
+			    		
+			    		//$scope.selectedIndgroup = response.data.resourceMaster.IND_GRP;
+			    		//Individual dropdown setting end
+			    		//Multiple section values start
+			    		$scope.multipleSectionGrid(response.data.resourceMaster.resourceDetail.rsrcBrndVrtclMaps);
+			    		//Multiple section values end
+			    		
+			    		$scope.changeHistory = response.data.resourceMaster.resourceDetail.CHANGE_HISTORY;
+			    		$scope.year = response.data.resourceMaster.resourceDetail.YEAR;
+			    		$scope.month = response.data.resourceMaster.resourceDetail.MONTH;
+			    		
+			    		$scope.indRMynChangeEvent();
+			    		
+			    		$("#loader").css("display","none"); 
+	    			}, function (response) {
+	    				console.log("Failure function");
+	    				$("#loader").css("display","none"); 
+	    			});
+    		
+    	};
+    	/*
+    	 * This is the function When click on Add Role button to populate the insert record overlay...
+    	 */
+    	$scope.addMultipleRole = function(str){
+    		$("#saveBtn").attr("disabled", false);
+        	$scope.mode = "add";
+        	if(str == "add"){
+        		if($scope.FTEPerRole != undefined || $scope.FTEPerRole != null){
+        			$scope.FTEPerRole = "";
+        		}
+        		if($scope.insertSelectedFundingBU != undefined || $scope.insertSelectedFundingBU != null){
+	        		 $scope.insertSelectedFundingBU = "";
+	        		 $scope.insertSelectedGroup = "";
+	        		 $scope.multipleBeneficiaryBU.length = 0;
+	        		 $scope.multipleBeneficiarySubBrand.length = 0;
+	        		 $scope.newMultiplesBeneficiary.length = 0;
+	        		 $scope.multipleBeneficiaryIOT.length = 0;
+	        		 $scope.multipleBeneficiaryIMT.length = 0;
+	        		 $scope.multipleRegion.length = 0;
+	        		 $scope.multipleBeneficiaryCountry.length = 0;
+	        		 $scope.multipleJobRole.length = 0;
+	        		 $scope.multipleJobroleSpecialities.length = 0;
+	        		 $scope.multipleprogram.length = 0;
+	        		 $scope.isGMR = "true";
+        		}
+        		if($scope.insertSelectedBeneficiaryBU != undefined || $scope.insertSelectedBeneficiaryBU != null){
+        			$scope.insertSelectedBeneficiaryBU = "";
+        		}
+        		if($scope.insertSelectedBeneficiarySubBrand != undefined || $scope.insertSelectedBeneficiarySubBrand != null){
+        			$scope.insertSelectedBeneficiarySubBrand = "";
+        		}
+        		if($scope.insertSelectedMission != undefined || $scope.insertSelectedMission != null){
+        			$scope.insertSelectedMission = "";
+        		}
+        		if($scope.insertSelectedBeneficiary != undefined || $scope.insertSelectedBeneficiary != null){
+        			$scope.insertSelectedBeneficiary = "";
+        		}
+        		if($scope.insertSelectedBeneficiryIOT != undefined || $scope.insertSelectedBeneficiryIOT != null){
+        			$scope.insertSelectedBeneficiryIOT = "";
+        		}
+        		if($scope.insertSelectedBeneficiaryIMT != undefined || $scope.insertSelectedBeneficiaryIMT != null){
+        			$scope.insertSelectedBeneficiaryIMT = "";
+        		}
+        		if($scope.insertSelectedRegion != undefined || $scope.insertSelectedRegion != null){
+        			$scope.insertSelectedRegion = "";
+        		}
+        		if($scope.insertSelectedBeneficiaryCountry != undefined || $scope.insertSelectedBeneficiaryCountry != null){
+        			$scope.insertSelectedBeneficiaryCountry = "";
+        		}
+        		if($scope.insertSelectedDiscipline != undefined || $scope.insertSelectedDiscipline != null){
+        			$scope.insertSelectedDiscipline = "";
+        		}
+        		if($scope.insertSelectedJobrole != undefined || $scope.insertSelectedJobrole != null){
+        			$scope.insertSelectedJobrole = "";
+        		}
+        		if($scope.insertSelectedJobroeSpecialities != undefined || $scope.insertSelectedJobroeSpecialities != null){
+        			$scope.insertSelectedJobroeSpecialities = "";
+        		}
+        		if($scope.insertSelectedProgram != undefined || $scope.insertSelectedProgram != null){
+        			$scope.insertSelectedProgram = "";
+        		}
+        		if($scope.insertSelectedFunBudDplmnt != undefined || $scope.insertSelectedFunBudDplmnt != null){
+        			$scope.insertSelectedFunBudDplmnt = "";
+        		}
+        		if($scope.insertSelectedIcafunded != undefined || $scope.insertSelectedIcafunded != null){
+        			$scope.insertSelectedIcafunded = "";
+        		}
+        	}
+        	ibmweb.overlay.show('addroleRecordOverlay', this);
+        	return false;
+        };
+        
+        /*
+         *  validation-overlay closing function
+         */
+        $scope.valoverlayClose = function(){
+        	ibmweb.overlay.hide('validation-overlay', this);
+    		return false;
+        };
+        
+        /*
+         * Funding bu onchange event on insert record overlay
+         * 
+         */
+        $scope.fundingBUChangeEvent = function(callbackReq,callbackFunc){
+        	$scope.insertSelectedBeneficiaryBU = "";
+        	$scope.multipleBeneficiaryBU.length = 0;
+        	$scope.insertSelectedBeneficiarySubBrand = "";
+        	$scope.multipleBeneficiarySubBrand.length = 0;
+        	var fundingBUObj = $scope.insertSelectedFundingBU;
+        	var selectedFundingBUId = fundingBUObj;
+        	$("#loader").css("display","block");
+        	console.log("loadFundBU");
+        	var req = {
+    			    method: 'POST',
+    			    url: './sendflexrequest?action=3rdQuadrant&servletAction=retrieveNextLevel&id='+selectedFundingBUId+'&doCompress=false',
+    			    headers: {
+    			        'Content-Type': 'application/json'
+    			    },
+    			    'dataType': 'json'
+    			};
+    			$http(req).then(function (response) {
+    			    console.log("Funding BU onchange event");
+    			    console.log(response);
+    			    $("#loader").css("display","none");
+    			    $scope.multipleBeneficiaryBU = $scope.brqDropdownSet(response.data.nextLevel);
+    			    if(callbackReq){
+    			    	console.log("Callback required variable...");
+    			    	$scope[callbackFunc]();
+    			    }
+    			}, function (response) {
+    				console.log("Failure function");
+    				$("#loader").css("display","none");
+    			});
+        };
+        
+        /*
+         * Beneficiary bu change event on insert record overlay
+         */
+        $scope.beneficiaryBUChangeEvent = function(callbackReq,callbackFunc){
+        	$scope.insertSelectedBeneficiarySubBrand = "";
+        	$scope.multipleBeneficiarySubBrand.length = 0;
+        	var selectedBeneficiaryBUId = $scope.insertSelectedBeneficiaryBU;
+        	$scope.multipleBeneficiarySubBrand = [];
+        	var req = {
+    			    method: 'POST',
+    			    url: './sendflexrequest?action=3rdQuadrant&servletAction=retrieveNextLevel&id='+selectedBeneficiaryBUId+'&doCompress=false',
+    			    headers: {
+    			        'Content-Type': 'application/json'
+    			    },
+    			    'dataType': 'json'
+    			};
+    			$http(req).then(function (response) {
+    			    $scope.multipleBeneficiarySubBrand = $scope.brqDropdownSet(response.data.nextLevel);
+    			    if(callbackReq){
+    			    	$scope[callbackFunc]();
+    			    }
+    			}, function (response) {
+    				console.log("Failure function");
+    			});
+        };
+        
+        /*
+         * Get mission description by passing mission id
+         */
+        $scope.missionDesc = function(missionId){
+        	for(var i=0; i<$scope.multiplesMission.length; i++){
+        		if(missionId == $scope.multiplesMission[i].lv_id){
+        			return $scope.multiplesMission[i].lv_desc;
+        		}
+        	}
+        };
+        
+        /*
+         * mission onchange event on insert record overlay
+         */
+        $scope.missionChangeEvent = function(callbackReq,callbackFunc){
+        	$scope.insertSelectedBeneficiary = "";
+        	$scope.newMultiplesBeneficiary.length = 0;
+        	$scope.insertSelectedBeneficiryIOT = "";
+        	$scope.multipleBeneficiaryIOT.length = 0;
+        	$scope.insertSelectedBeneficiaryIMT = "";
+        	$scope.multipleBeneficiaryIMT.length = 0;
+        	$scope.insertSelectedRegion = "";
+        	$scope.multipleRegion.length = 0;
+        	$scope.insertSelectedBeneficiaryCountry = "";
+        	$scope.multipleBeneficiaryCountry.length = 0;
+        	
+        	var missionobj = $scope.insertSelectedMission;
+        	//var selectedMissionId = $scope.missionDesc(missionobj);
+        	var selectedMissionDesc = $scope.missionDesc(missionobj);
+        	$scope.newMultiplesBeneficiary = [];
+        	
+        	if(selectedMissionDesc == "HQ (WW)"){
+        		for(var i=0; i<$scope.multiplesBeneficiary.length; i++){
+        			if($scope.multiplesBeneficiary[i].lv_desc=="HQ (WW)"){
+        				$scope.newMultiplesBeneficiary.push({"lv_id":$scope.multiplesBeneficiary[i].lv_id,"lv_desc":$scope.multiplesBeneficiary[i].lv_desc});
+        			}
+        		}
+        	}else if(selectedMissionDesc.indexOf("Digital") != -1){
+        		for(var i=0; i<$scope.multiplesBeneficiary.length; i++){ 
+    			    var obj = {};
+        			obj.lv_id = $scope.multiplesBeneficiary[i].lv_id;
+        			obj.lv_desc = $scope.multiplesBeneficiary[i].lv_desc;
+        		    $scope.newMultiplesBeneficiary.push(obj);
+    			}
+    	}else {
+        		for(var i=0; i<$scope.multiplesBeneficiary.length; i++){
+        			if($scope.multiplesBeneficiary[i].lv_desc=="Geo"){
+        				$scope.newMultiplesBeneficiary.push({"lv_id":$scope.multiplesBeneficiary[i].lv_id,"lv_desc":$scope.multiplesBeneficiary[i].lv_desc});
+        			}
+        		}
+    	     }
+        	
+        	if($scope.newMultiplesBeneficiary.length > 1){
+        		$scope.insertSelectedBeneficiary;
+        	}else{
+        		var obj = {"lv_id":$scope.newMultiplesBeneficiary[0].lv_id,"lv_desc":$scope.newMultiplesBeneficiary[0].lv_desc};
+        		$scope.insertSelectedBeneficiary = obj.lv_id;
+        	}
+        	$scope.beneficiaryChangeEvent(callbackReq,callbackFunc);
+        };
+        
+        /*
+         * beneficiary change event on insert record overlay
+         */
+        $scope.beneficiaryChangeEvent = function(callbackReq,callbackFunc){
+        	$scope.insertSelectedBeneficiryIOT = "";
+        	$scope.multipleBeneficiaryIOT.length = 0;
+        	$scope.insertSelectedBeneficiaryIMT = "";
+        	$scope.multipleBeneficiaryIMT.length = 0;
+        	$scope.insertSelectedRegion = "";
+        	$scope.multipleRegion.length = 0;
+        	$scope.insertSelectedBeneficiaryCountry = "";
+        	
+        	var beneficiaryobj = $scope.insertSelectedBeneficiary;
+        	var selectedBeneficiaryObj = beneficiaryobj; 
+        	var selectedBeneficiaryId = selectedBeneficiaryObj;
+        	var missionobj = $scope.insertSelectedMission;
+        	var selectedMissionDesc = $scope.missionDesc(missionobj);
+        	$scope.multipleBeneficiaryIOT = [];
+        	var req = {
+    			    method: 'POST',
+    			    url: './sendflexrequest?action=3rdQuadrant&servletAction=retrieveNextLevel&id='+selectedBeneficiaryId+'&mission='+selectedMissionDesc+'&doCompress=false',
+    			    headers: {
+    			        'Content-Type': 'application/json'
+    			    },
+    			    'dataType': 'json'
+    			};
+    			$http(req).then(function (response) {
+    			   console.log("mission change event");
+    			   console.log(response);
+    			   $scope.multipleBeneficiaryIOT = $scope.brqDropdownSet(response.data.nextLevel);
+    			   if(callbackReq){
+    				   $scope[callbackFunc]();
+    			   }
+    			}, function (response) {
+    				console.log("Failure function");
+    			});
+        };
+        
+        /*
+         * beneficiary iot change event on insert record overlay
+         */
+        $scope.benecifiaryIOTChangeEvent = function(callbackReq,callbackFunc){
+        	$scope.insertSelectedBeneficiaryIMT = "";
+        	$scope.multipleBeneficiaryIMT.length = 0;
+        	$scope.insertSelectedRegion = "";
+        	$scope.multipleRegion.length = 0;
+        	$scope.insertSelectedBeneficiaryCountry = "";
+        	$scope.multipleBeneficiaryCountry.length = 0;
+        	
+        	var missionObj = $scope.insertSelectedMission;
+        	var inserSelectedMission = $scope.missionDesc(missionObj);
+        	//var inserSelectedMission = missionObj.lv_desc;
+        	var beneficiaryIOTObj = $scope.insertSelectedBeneficiryIOT;
+        	//var beneficiaryIOTId = JSON.parse(beneficiaryIOTObj).lv_id;
+        	var beneficiaryIOTId = beneficiaryIOTObj;
+        	$scope.multipleBeneficiaryIMT = [];
+        	var req = {
+    			    method: 'POST',
+    			    url: './sendflexrequest?action=3rdQuadrant&servletAction=retrieveNextLevel&id='+beneficiaryIOTId+'&mission='+inserSelectedMission+'&doCompress=false',
+    			    headers: {
+    			        'Content-Type': 'application/json'
+    			    },
+    			    'dataType': 'json'
+    			};
+    			$http(req).then(function (response) {
+    			   console.log("iot  change event");
+    			   console.log(response);
+    			   $scope.multipleBeneficiaryIMT = $scope.brqDropdownSet(response.data.nextLevel);
+    			   if(callbackReq){
+    				   $scope[callbackFunc]();
+    			   }
+    			}, function (response) {
+    				console.log("Failure function");
+    			});
+        };
+        /*
+         * beneficiary imt change event on insert record overlay
+         */
+        $scope.benecifiaryIMTChangeEvent = function(callbackReq,callbackFunc){
+        	$scope.insertSelectedRegion = "";
+        	$scope.multipleRegion.length = 0;
+        	$scope.insertSelectedBeneficiaryCountry = "";
+        	$scope.multipleBeneficiaryCountry.length = 0;
+        	
+        	var beneficiaryIMTObj = $scope.insertSelectedBeneficiaryIMT;
+        	//var beneimtObj = beneficiaryIMTObj;
+        	var missionobj = $scope.insertSelectedMission;
+        	var insertedSelectedMission = $scope.missionDesc(missionobj);
+        	//var insertedSelectedMission = JSON.parse(missionobj).lv_desc;
+        	var beneficiaryIMTId = beneficiaryIMTObj;
+        	//var beneficiaryIMTId = beneimtObj.lv_id;
+        	$scope.multipleCountry = [];
+        	var req = {
+    			    method: 'POST',
+    			    url: './sendflexrequest?action=3rdQuadrant&servletAction=retrieveNextLevel&id='+beneficiaryIMTId+'&mission='+insertedSelectedMission+'&doCompress=false',
+    			    headers: {
+    			        'Content-Type': 'application/json'
+    			    },
+    			    'dataType': 'json'
+    			};
+    			$http(req).then(function (response) {
+    			   console.log("IMT  change event");
+    			   console.log(response);
+    			   $scope.multipleRegion = [];
+    			   $scope.multipleBeneficiaryCountry = [];
+    			   $scope.isGMR;
+    			   $scope.multipleCountry = $scope.brqDropdownSet(response.data.nextLevel);
+    			   
+    			   for(var imt=0; imt<$scope.multipleCountry.length; imt++){
+    				   var obj = {};
+    				   if($scope.multipleCountry[imt].lm_id == "20"){
+    					     $scope.isGMR = "true";
+    		        		 obj.lm_id =   $scope.multipleCountry[imt].lm_id;
+    		        		 obj.lv_code = $scope.multipleCountry[imt].lv_code;
+    		        		 obj.lv_desc = $scope.multipleCountry[imt].lv_desc;
+    		        		 obj.lv_id =   $scope.multipleCountry[imt].lv_id;
+    		        		 obj.lv_pkey = $scope.multipleCountry[imt].lv_pkey;
+    					     $scope.multipleRegion.push(obj);
+    				   }else{
+    					     $scope.isGMR = "false";
+    					     obj.lm_id =   $scope.multipleCountry[imt].lm_id;
+    		        		 obj.lv_code = $scope.multipleCountry[imt].lv_code;
+    		        		 obj.lv_desc = $scope.multipleCountry[imt].lv_desc;
+    		        		 obj.lv_id =   $scope.multipleCountry[imt].lv_id;
+    		        		 obj.lv_pkey = $scope.multipleCountry[imt].lv_pkey;
+    					     $scope.multipleBeneficiaryCountry.push(obj);
+    				   }
+    			   }
+    			   if($scope.multipleRegion.length == 0){
+	    			    if($scope.multipleBeneficiaryCountry.length > 1){
+			        		$scope.insertSelectedBeneficiaryCountry;
+			        	}else{
+			        		var obj = {"lv_id":$scope.multipleBeneficiaryCountry[0].lv_id,"lv_desc":$scope.multipleBeneficiaryCountry[0].lv_desc};
+			        		$scope.insertSelectedBeneficiaryCountry = obj.lv_id;
+			        	}
+    			   } 
+    			   if(callbackReq){
+    				   $scope[callbackFunc]();
+    			   }
+    			}, function (response) {
+    				console.log("Failure function");
+    			});
+        };
+        /*
+         * region change event on insert record overlay
+         */
+        $scope.regionChangeEvent = function(callbackReq,callbackFunc){
+    	    console.log("region change event...");
+    	    $scope.insertSelectedBeneficiaryCountry = "";
+        	$scope.multipleBeneficiaryCountry.length = 0;
+    	    var regionlvId = $scope.insertSelectedRegion;
+        	var missionobj = $scope.insertSelectedMission;
+        	//var insertedSelectedMission = JSON.parse(missionobj).lv_desc;
+        	var insertedSelectedMission = $scope.missionDesc(missionobj);
+        	$scope.multipleBeneficiaryCountry = [];
+        	var req = {
+    			    method: 'POST',
+    			    url: './sendflexrequest?action=3rdQuadrant&servletAction=retrieveNextLevel&id='+regionlvId+'&mission='+insertedSelectedMission+'&doCompress=false',
+    			    headers: {
+    			        'Content-Type': 'application/json'
+    			    },
+    			    'dataType': 'json'
+    			};
+    			$http(req).then(function (response) {
+    			   console.log("region change event response");
+    			   console.log(response);
+    			   $scope.multipleBeneficiaryCountry = $scope.brqDropdownSet(response.data.nextLevel);
+    			   if(callbackReq){
+    				   $scope[callbackFunc]();
+    			   }
+    			}, function (response) {
+    				console.log("Failure function");
+    			});
+    };
+    /*
+     *  discipline change event on insert record overlay
+     */
+    $scope.disciplineChangeEvent = function(callbackReq,callbackFunc){
+    	$scope.insertSelectedJobrole = "";
+    	$scope.multipleJobRole.length = 0;
+    	$scope.insertSelectedProgram = "";
+    	$scope.multipleprogram.length = 0;
+    	var disciplineId = $scope.insertSelectedDiscipline;
+    	 $scope.multipleJobRole = [];
+    	var req = {
+			    method: 'POST',
+			    url: './sendflexrequest?action=3rdQuadrant&servletAction=retrieveNextLevel&id='+disciplineId+'&lmId=85'+'&doCompress=false',
+			    headers: {
+			        'Content-Type': 'application/json'
+			    },
+			    'dataType': 'json'
+			};
+			$http(req).then(function (response) {
+			   $scope.multipleJobRole = $scope.brqDropdownSet(response.data.nextLevel);
+			   $scope.multipleProgram(disciplineId,callbackReq,callbackFunc);
+			}, function (response) {
+				console.log("Failure function");
+			});
+    };
+    
+    /*
+     *  program dropdown onchange event on insert record overlay
+     */
+    $scope.multipleProgram = function(disciplineId,callbackReq,callbackFunc){
+    	console.log("multiple program");
+    	$scope.multipleprogram = [];
+    	var req = {
+			    method: 'POST',
+			    url: './sendflexrequest?action=3rdQuadrant&servletAction=retrieveNextLevel&id='+disciplineId+'&lmId=200'+'&doCompress=false',
+			    headers: {
+			        'Content-Type': 'application/json'
+			    },
+			    'dataType': 'json'
+			};
+			$http(req).then(function (response) {
+			   $scope.multipleprogram = $scope.brqDropdownSet(response.data.nextLevel);
+			   if(callbackReq){
+				   $scope[callbackFunc]();
+			   }
+			}, function (response) {
+				console.log("Failure function");
+			});
+    };
+    /*
+     *  jobrole dropdown onchange event on insert record overlay
+     */
+    $scope.jobroleChangeEvent = function(callbackReq,callbackFunc){
+    	console.log("job role change event");
+    	$scope.insertSelectedJobroeSpecialities = "";
+    	$scope.multipleJobroleSpecialities.length = 0;
+    	var jobroleId = $scope.insertSelectedJobrole;
+    	$scope.multipleJobroleSpecialities = [];
+    	var req = {
+			    method: 'POST',
+			    url: './sendflexrequest?action=3rdQuadrant&servletAction=retrieveNextLevel&id='+jobroleId+'&doCompress=false',
+			    headers: {
+			        'Content-Type': 'application/json'
+			    },
+			    'dataType': 'json'
+			};
+			$http(req).then(function (response) {
+			   $scope.multipleJobroleSpecialities = $scope.brqDropdownSet(response.data.nextLevel);
+			   if(callbackReq){
+				   $scope[callbackFunc]();
+			   }
+			}, function (response) {
+				console.log("Failure function");
+			});
+    };
+    
+    $scope.showActualAlert = function(val1,val2,val3){
+    	if(val1){
+			// val1 specific
+			if ($scope.notesId == "") {
+				alert(APPCONSTANTS.ENTER_NOTES_ID);
+			} else if($scope.hriwSerialNum == ""){
+				alert(APPCONSTANTS.ENTER_SERIAL_NO);
+			}else if($scope.firstName == ""){
+				alert(APPCONSTANTS.ENTER_FIRST_NAME);
+			} else if($scope.lastName == ""){
+				alert(APPCONSTANTS.ENTER_LAST_NAME);
+			} else {
+				$scope.showCommonAlert();	
+			}
+		} else if(val2){
+			// val2 specific
+			$scope.showCommonAlert();
+		} else if(val3){
+			// val3 specific
+			$scope.showCommonAlert();
+		} 
+    };
+    
+    /*
+     * It is the function to show the alert message
+     */
+    $scope.showAlert = function(msg){
+    	$scope.showAlertMsg_brq = msg;
+     	ibmweb.overlay.show('showalertbrq',this);
+    };
+    
+    /*
+     *  It is the function to show the validation message
+     */
+    $scope.showCommonAlert = function(){
+    	if($scope.isHriwFeedComp){
+			if($("#brq_ind-group :selected").val() == ""){
+				$scope.showAlert(APPCONSTANTS.INDGP_VALUE_EMPTY);
+			} else if ($scope.functMgr == "") {
+				$scope.showAlert(APPCONSTANTS.FN_MGR_VALUE_EMPTY);
+			} else if ($('#brq_emp-type :selected').val() == "") {
+				$scope.showAlert(APPCONSTANTS.EMP_TYPE_EMPTY);
+			} else if($('#brq_physical-iot :selected').val() == ""){
+				$scope.showAlert(APPCONSTANTS.PHYLOC_IOT_EMPTY);
+			} else if($('#brq_physical-imt :selected').val() == ""){
+				$scope.showAlert(APPCONSTANTS.PHYLOC_IMT_EMPTY);
+			} else if($('#brq_country-res :selected').val() == ""){
+				$scope.showAlert(APPCONSTANTS.PHYLOC_COUNTRY_RESIDENCY_EMPTY);
+			} else if($('#brq_hiring-org :selected').val() == ""){
+				$scope.showAlert(APPCONSTANTS.HIRING_ORG_VALUE_EMPTY)
+			} else if($('#brq_prim-job-cat :selected').val() == ""){
+			    $scope.showAlert(APPCONSTANTS.PRIMARY_JOBCAT_VALUE_EMPTY);
+			} else if($('#brq_fund-src :selected').val() == ""){
+				$scope.showAlert(APPCONSTANTS.FUNDING_SOURCE_VALUE_EMPTY);
+			} else if($('#brq_rmyn :selected').val()  == ""){
+				$scope.showAlert(APPCONSTANTS.RM_YES_NO_VALUE_EMPTY);
+			} else if($('#brq_status :selected').val()  == ""){
+				$scope.showAlert(APPCONSTANTS.STATUS_VALUE_EMPTY);
+			} else if($('#brq_rmloc').is(':enabled') && $('#brq_rmloc :selected').val() == ""){
+				$scope.showAlert(APPCONSTANTS.RM_LOCS_VALUE_EMPTY);
+			} else if($scope.multiRoleAC.length == 0){
+				$scope.showAlert(APPCONSTANTS.ADD_ATLEAST_1_ROLE);
+			} else if($('#brq_status :selected').text() == "On Board" && parseFloat($('#brq_actual_headcount').val()) <= 0.00) {
+				$scope.showAlert(APPCONSTANTS.VALIDATION_FOR_ONBOARD_AND_GREATER_THAN_ONE);
+			} else if($('#brq_isexec :selected').val() == ""){
+				$scope.showAlert(APPCONSTANTS.IS_EXEC_YES_NO_VALUE_EMPTY);
+			} else if($('#brq_istl :selected').val() == ""){
+			    $scope.showAlert(APPCONSTANTS.IS_TL_YES_NO_VALUE_EMPTY);
+			}else{
+				$scope.setDataStr();
+			}
+		} else {
+			if($('#brq_ind-group :selected').val() == ""){
+				$scope.showAlert(APPCONSTANTS.INDGP_VALUE_EMPTY);
+			} else if ($scope.functMgr == "") {
+				$scope.showAlert(APPCONSTANTS.FN_MGR_VALUE_EMPTY);
+			} else if($('#brq_physical-iot :selected').val() != "" && $('#brq_physical-imt :selected').val() == "" && $('#brq_country-res :selected').val() == ""){
+				$scope.showAlert(APPCONSTANTS.PHYLOC_IMT_EMPTY);
+			}else if($('#brq_physical-iot :selected').val() != "" && $('#brq_physical-imt :selected').val() != "" && $('#brq_country-res :selected').val() == ""){
+				$scope.showAlert(APPCONSTANTS.PHYLOC_COUNTRY_RESIDENCY_EMPTY);
+			}else if($('#brq_hiring-org :selected').val() == ""){
+				$scope.showAlert(APPCONSTANTS.HIRING_ORG_VALUE_EMPTY);
+			}else if($('#brq_prim-job-cat :selected').val() == ""){
+				$scope.showAlert(APPCONSTANTS.PRIMARY_JOBCAT_VALUE_EMPTY);
+			}else if($('#brq_fund-src :selected').val() == ""){
+				$scope.showAlert(APPCONSTANTS.FUNDING_SOURCE_VALUE_EMPTY);
+			}else if($('#brq_rmyn :selected').val() == ""){
+				$scope.showAlert(APPCONSTANTS.RM_YES_NO_VALUE_EMPTY);
+			}else if($('#brq_status :selected').val() == ""){
+				$scope.showAlert(APPCONSTANTS.STATUS_VALUE_EMPTY);
+			}else if($('#brq_rmloc').is(':enabled') && $('#brq_rmloc :selected').val() == ""){
+				$scope.showAlert(APPCONSTANTS.RM_LOCS_VALUE_EMPTY);
+			} else if($scope.multiRoleAC.length == 0){
+				$scope.showAlert(APPCONSTANTS.ADD_ATLEAST_1_ROLE);
+			} else if($('#brq_status :selected').text() == "On Board" && parseFloat($('#brq_actual_headcount').val()) <= 0.00) {
+				$scope.showAlert(APPCONSTANTS.VALIDATION_FOR_ONBOARD_AND_GREATER_THAN_ONE);
+			} else if($('#brq_isexec :selected').val() == ""){
+				$scope.showAlert(APPCONSTANTS.IS_EXEC_YES_NO_VALUE_EMPTY);
+			} else if($('#brq_istl :selected').val() == ""){
+				$scope.showAlert(APPCONSTANTS.IS_TL_YES_NO_VALUE_EMPTY);
+			} else{
+				$scope.setDataStr();
+			}
+		}
+		$scope.validate1 = false;
+		$scope.validate2 = false;
+		$scope.validate3 = false;
+    };
+    /*
+     * It is the function that will call when click on Save button
+     */
+    $scope.saveButtonHandler = function(){
+    	console.log("saveButtonHandler...");
+    	if($scope.multiRoleAC.length != 0){
+    		if($scope.isMarkedDeparted){
+				$scope.setDataStr();
+			} else if($scope.isMarkedTransfer || $scope.isMarkedTransferOutside){
+				$scope.setDataStr();
+			}else if($('#brq_status :selected').text() == "On Board"  &&  !$scope.isNotesValFlag &&  $('#brq_ind-group :selected').text() == "Individual"){
+				alert(APPCONSTANTS.VALIDATION_FOR_NOTES);
+			}else{
+				if($('#brq_status :selected').text() == "On Board"  &&  $('#brq_ind-group :selected').text() == "Individual" ){
+						if($scope.isHriwFeedComp == true && $('#brq_ind-group :selected').val() != "" &&  $scope.functMgr != "" && $('#brq_physical-iot :selected').val() != "" && $('#brq_physical-imt :selected').val() != "" &&  
+							$('#brq_country-res :selected').val() != "" && $('#brq_emp-type :selected').val() != "" && $('#brq_is-manager :selected').val() != "" &&
+							$scope.hriwCountryNum != ""  &&  $('#brq_hiring-org :selected').val() != "" &&
+							$('#brq_prim-job-cat :selected').val() != ""  && $('#brq_fund-src :selected').val() != "" && $('#brq_rmyn :selected').val() != "" &&  
+							$('#brq_status :selected').val() != "" && $('#brq_rmloc :selected').val() != "" && $scope.notesId != "" && $scope.hriwSerialNum != "" &&
+							$scope.firstName != "" && $scope.lastName != "" && $('#brq_isexec :selected').val() != "" && $('#brq_istl :selected').val() != "") {
+							$scope.setDataStr();
+						}else if($scope.isHriwFeedComp == false && $('#brq_ind-group :selected').val() != "" &&  $scope.functMgr != "" &&   
+							$scope.hriwCountryNum != ""  &&  $('#brq_hiring-org :selected').val() != "" &&
+							$('#brq_prim-job-cat :selected').val() != ""  && $('#brq_fund-src :selected').val() != "" && $('#brq_rmyn :selected').val() != "" &&  
+							$('#brq_status :selected').val() != "" && $('#brq_rmloc :selected').val() != "" && $scope.notesId != "" && $scope.hriwSerialNum != "" &&
+							$scope.firstName != "" && $scope.lastName != "" && $('#brq_isexec :selected').val() != "" && $('#brq_istl :selected').val() != ""){
+							$scope.setDataStr();
+						} 
+						else { // show alert
+							$scope.validate1 = true;
+							$scope.validate2 = false;
+							$scope.validate3 = false;
+							$scope.showActualAlert($scope.validate1, $scope.validate2, $scope.validate3);
+						}
+						
+				} else if($('#brq_ind-group :selected').text() == "Group") {	// if status is not on-board
+					if($scope.isHriwFeedComp == true && $('#brq_ind-group :selected').val() != "" &&  $scope.functMgr != "" && $('#brq_physical-iot :selected').val() != "" && $('#brq_physical-imt :selected').val() != "" && 
+						$('#brq_country-res :selected').val() != "" && $('#brq_emp-type :selected').val() != "" && $('#brq_is-manager :selected').val() != "" &&
+						$scope.hriwCountryNum != ""  &&  $('#brq_hiring-org :selected').val() != "" &&
+						$('#brq_prim-job-cat :selected').val() != ""  && $('#brq_fund-src :selected').val() != "" && $('#brq_rmyn :selected').val() != "" &&  
+						$('#brq_status :selected').val() != "" && $('#brq_rmloc :selected').val() != "" && $('#brq_isexec :selected').val() != "" && $('#brq_istl :selected').val() != "" ) {
+						$scope.setDataStr();
+					}else if($scope.isHriwFeedComp == false && $('#brq_ind-group :selected').val() != "" &&  $scope.functMgr != "" &&   
+							$scope.hriwCountryNum != ""  &&  $('#brq_hiring-org :selected').val() != "" &&
+							$('#brq_prim-job-cat :selected').val() != ""  && $('#brq_fund-src :selected').val() != "" && $('#brq_rmyn :selected').val() != "" &&  
+							$('#brq_status :selected').val() != "" && $('#brq_rmloc :selected').val() != "" && $scope.notesId != "" && $scope.hriwSerialNum != "" != "" &&
+							$scope.firstName != "" && $scope.lastName != "" && $('#brq_isexec :selected').val() != "" && $('#brq_istl :selected').val() != ""){
+							$scope.setDataStr();
+						}  
+					else { // show alert
+						$scope.validate1 = false;
+						$scope.validate2 = true;
+						$scope.validate3 = false;
+						$scope.showActualAlert($scope.validate1, $scope.validate2, $scope.validate3);
+					}
+				} else {
+					if($scope.isHriwFeedComp == true && $('#brq_ind-group :selected').val()  != "" &&  $scope.functMgr != "" && $('#brq_physical-iot :selected').val() != "" && $('#brq_physical-imt :selected').val() != "" && 
+						$('#brq_country-res :selected').val() != "" && $('#brq_emp-type :selected').val() != "" && $('#brq_is-manager :selected').val() != "" &&
+						$scope.hriwCountryNum != ""  &&  $('#brq_hiring-org :selected').val() != "" &&
+						$('#brq_prim-job-cat :selected').val() != ""  && $('#brq_fund-src :selected').val() != "" && $('#brq_rmyn :selected').val() != "" &&  
+						$('#brq_status :selected').val() != "" && $('#brq_rmloc :selected').val() != "" && $('#brq_isexec :selected').val() != "" && $('#brq_istl :selected').val() != "") {
+						$scope.setDataStr();
+					}else if($scope.isHriwFeedComp == false && $('#brq_ind-group :selected').val()  != "" &&  $scope.functMgr != "" &&  
+							$scope.hriwCountryNum != ""  &&  $('#brq_hiring-org :selected').val() != "" &&
+							$('#brq_prim-job-cat :selected').val() != ""  && $('#brq_fund-src :selected').val() != "" && $('#brq_rmyn :selected').val() != "" &&  
+							$('#brq_status :selected').val() != "" && $('#brq_rmloc :selected').val() != "" && $('#brq_isexec :selected').val() != "" && $('#brq_istl :selected').val() != "") {
+							$scope.setDataStr();
+					}			
+					else { // show alert
+						$scope.validate1 = false;
+						$scope.validate2 = false;
+						$scope.validate3 = true;
+						$scope.showActualAlert($scope.validate1, $scope.validate2, $scope.validate3);
+					}
+				}
+			} 
+    	}else{
+			alert(APPCONSTANTS.ADD_ATLEAST_1_ROLE);
+		}
+    };
+    /*
+     * It is the function to set the data string that should be passed to the save func
+     */
+    $scope.setDataStr = function(){
+	    console.log("setdata str");
+	    //console.log($scope.brqmultiplegridoptions.data.length);
+	    console.log($scope.multiRoleAC.length);
+	    console.log($scope.multiRoleAC);
+	    var currentDate = new Date();
+	    var dateTxt = currentDate.getMonth() + "/"+ currentDate.getDate() + "/"+ currentDate.getFullYear();
+	    var dateField = ($scope.dateRole == " "? " ":$scope.dateRole);
+	    var fieldSeparator = "~";
+	    var departReasonStr;
+	    var deptReason = $('#brq_dept-reason');
+	    var hriwSec = "";
+	    var firstSec = "";
+	    var indSec = "";
+	    
+	    if(deptReason.is(':enabled')){
+	    	if(deptReason.val() == ""){
+	    		departReasonStr = "-1^-1";
+	    	}else{
+				departReasonStr = (($("#brq_dept-reason :selected").val() == "" ? "-1" : $("#brq_dept-reason :selected").val()) + "^" + ($("#brq_dept-reason :selected").text() == "" ? "-1" : $("#brq_dept-reason :selected").text()));
+	    	}
+	    }else{
+	    	    departReasonStr = "-1^-1";
+	    }
+	    
+	    firstSec = ($('#brq_ind-group :selected').val() +"^"+ $('#brq_ind-group :selected').text()) + fieldSeparator 
+		+ ( $('#brq_date_role').val() == "" ? "1/1/1900" : $('#brq_date_role').val() ) + fieldSeparator 
+		+ ( $('#brq_comments').val() == "" ? "-1" : $('#brq_comments').val()) + fieldSeparator 
+		+ ( $('#brq_notesid').val() == "" ? "-1" : $('#brq_notesid').val()) + fieldSeparator
+		+ ( $('#brq_funct_manager').val() == "" ? "-1" : $('#brq_funct_manager').val()) + fieldSeparator
+		+ ( $('#brq_first_name').val() == "" ? "-1" : $('#brq_first_name').val()) + fieldSeparator
+		+ ( $('#brq_job_respons').val()  == "" ? "-1" : $('#brq_job_respons').val()) + fieldSeparator 
+		+ departReasonStr + fieldSeparator 
+		+ ( $('#brq_last_name').val() == "" ? "-1" : $('#brq_last_name').val()) + fieldSeparator
+		+ ( $('#brq_glob_mgr').val() == "" ? "-1" : $('#brq_glob_mgr').val()) + fieldSeparator;
+	
+	    var hriwSecComboValues;
+	    
+	    var physIOTStr;
+	    if($('#brq_physical-iot :selected').val() == ""){
+			physIOTStr = "-1^-1";
+		} else {
+			physIOTStr = (($('#brq_physical-iot :selected').val() == "" ? "-1":$('#brq_physical-iot :selected').val()) + "^" +  ($('#brq_physical-iot :selected').text() == "" ? "-1" :$('#brq_physical-iot :selected').text()));
+		}
+	    
+	    var physIMTStr;
+		if($('#brq_physical-imt :selected').val() == ""){
+			physIMTStr = "-1^-1";
+		} else {
+			physIMTStr = (($('#brq_physical-imt :selected').val() == "" ? "-1":$('#brq_physical-imt :selected').val()) + "^" +  ($('#brq_physical-imt :selected').text() == "" ? "-1" :$('#brq_physical-imt :selected').text()));
+		}
+		
+		var countryResStr;
+		if($('#brq_country-res :selected').val() == ""){
+			countryResStr = "-1^-1";
+		} else {
+			countryResStr = (($('#brq_country-res :selected').val() == "" ? "-1":$('#brq_country-res :selected').val()) + "^" +  ($('#brq_country-res :selected').text() == "" ? "-1" :$('#brq_country-res :selected').text()));
+		}
+		
+		var empTypeCompStr;
+		if($('#brq_emp-type :selected').val() == ""){
+			empTypeCompStr = "-1^-1";
+		}else{
+			empTypeCompStr = (($('#brq_emp-type :selected').val() == "" ? "-1" :$('#brq_emp-type :selected').val()) + "^" + ($('#brq_emp-type :selected').text() == "" ? "-1" :$('#brq_emp-type :selected').text()))
+		}
+		
+		var empType_HriwText;
+		if($scope.hriwEmpType == ""){
+			empType_HriwText ="-1^-1";
+		}else{
+			empType_HriwText = (($scope.hriwEmpType_Id == "" ? "-1" :$scope.hriwEmpType_Id) + "^" + ($scope.hriwEmpType == "" ? "-1" :$scope.hriwEmpType) )
+		}
+		
+		var isMgrStr;
+			if($('#brq_is-manager :selected').val() == -1){
+				isMgrStr ="-1^-1";
+			}else{
+				isMgrStr = (($('#brq_is-manager :selected').val() == "" ? "-1":$('#brq_is-manager :selected').val()) + "^" +  ($('#brq_is-manager :selected').text() == "" ? "-1" :$('#brq_is-manager :selected').text()));
+			}
+			
+	    var phyLocIOT_HriwTextStr;
+	    if($scope.physicalLocationIOT == ""){
+				phyLocIOT_HriwTextStr = "-1^-1"; 
+		 }else{
+				phyLocIOT_HriwTextStr = (($scope.physicalLocationIOT_Id == "" ? "-1":$scope.physicalLocationIOT_Id) + "^" +  ($scope.physicalLocationIOT == "" ? "-1" :$scope.physicalLocationIOT));
+		 }
+	    
+	    var phyLocIMT_HriwTextStr;
+		if($scope.physicalLocationIMT == ""){
+			phyLocIMT_HriwTextStr = "-1^-1"; 
+		}else{
+			phyLocIMT_HriwTextStr = (($scope.physicalLocationIMT_Id == "" ? "-1":$scope.physicalLocationIMT_Id) + "^" +  ($scope.physicalLocationIMT == "" ? "-1" :$scope.physicalLocationIMT));
+		}
+		
+		var phyLocCountry_HriwTextStr;
+		if($scope.countryOfResidence == ""){
+			phyLocCountry_HriwTextStr = "-1^-1"; 
+		}else{
+			phyLocCountry_HriwTextStr = (($scope.countryOfResidence_Id == "" ? "-1":$scope.countryOfResidence_Id) + "^" +  ($scope.countryOfResidence == "" ? "-1" :$scope.countryOfResidence));
+		}
+	    
+		if($scope.isHriwFeedComp){
+			hriwSecComboValues = (physIOTStr) + fieldSeparator 
+				+ (physIMTStr) + fieldSeparator 
+				+ (countryResStr )	+ fieldSeparator 
+				+ (empTypeCompStr) + fieldSeparator 
+				+ (isMgrStr) + fieldSeparator ;
+			
+		} else if($scope.isHriwFeedLabel){
+			hriwSecComboValues = (phyLocIOT_HriwTextStr) + fieldSeparator 
+				+ (phyLocIMT_HriwTextStr) + fieldSeparator 
+				+ (phyLocCountry_HriwTextStr)	+ fieldSeparator 
+				+ (empType_HriwText) + fieldSeparator 
+				+ ($scope.isMgr_HriwId + "^" + $scope.isMgr_HriwText) + fieldSeparator ;
+		}
+			hriwSec = hriwSecComboValues
+			+ ($scope.hriwAccMgr == "" ? "-1": $scope.hriwAccMgr) + fieldSeparator 
+			+ ($scope.hriwjobcatCodeName == "" ? "-1" : $scope.hriwjobcatCodeName) + fieldSeparator 
+			+ ($scope.hriwFinacialQualifier == "" ? "-1" : $scope.hriwFinacialQualifier) + fieldSeparator
+			+ ($scope.hriwWorkperiodScheduled == "" ? "-1" : $scope.hriwWorkperiodScheduled)+ fieldSeparator
+			+ ($scope.hriwaccdept == "" ? "-1" : $scope.hriwaccdept) + fieldSeparator
+			+ ($scope.hriwCountryNum == "" ? "-1" : $scope.hriwCountryNum) +fieldSeparator
+			+ ($scope.hriwSerialNum == "" ? "-1" : $scope.hriwSerialNum) + fieldSeparator 
+			+ ($scope.hriwintranetId == "" ? "-1" :$scope.hriwintranetId) +fieldSeparator
+			+ ($scope.hriwRepMgr == "" ? "-1" : $scope.hriwRepMgr) + fieldSeparator 
+			+ ($scope.hriwBPworklocCode == "" ? "-1" : $scope.hriwBPworklocCode) + fieldSeparator 
+			+ ($scope.hriwBpworkplaceInd == "" ? "-1" : $scope.hriwBpworkplaceInd) + fieldSeparator;
+
+			var xferStatus;
+			if($scope.isMarkedTransfer || $scope.isMarkedTransferOutside){
+				xferStatus = $scope.selectedXferTypeId + "^" + $scope.selectedXferTypeLabel;
+			} else {
+				xferStatus = $('#brq_status :selected').val() + "^"+ $('#brq_status :selected').text();
+			}
+			var rmShiftStr;
+			if($('#brq_rmshift :selected').val() == ""){
+				rmShiftStr = "-1^-1";
+			} else {
+				rmShiftStr = (($('#brq_rmshift :selected').val() == "" ? "-1":$('#brq_rmshift :selected').val()) + "^" +  ($('#brq_rmshift :selected').text() == "" ? "-1" :$('#brq_rmshift :selected').text()));
+			}
+			var rmCityStr;
+			if($('#brq_rmcity :selected').val() == ""){
+				rmCityStr = "-1^-1";
+			} else {
+				rmCityStr = (($('#brq_rmcity :selected').val() == "" ? "-1" : $('#brq_rmcity :selected').val()) + "^" +($('#brq_rmcity :selected').text() == "" ?  "-1" :$('#brq_rmcity :selected').text() ));
+			}
+			var rmBillingStr;
+			if($('#brq_rmbil-type :selected').val() == ""){ 
+				rmBillingStr = "-1^-1";
+			} else {
+				rmBillingStr = (($('#brq_rmbil-type :selected').val() == "" ? "-1":$('#brq_rmbil-type :selected').val()) + "^" +($('#brq_rmbil-type :selected').text() == "" ? "-1" :$('#brq_rmbil-type :selected').text())) ;
+			}
+			
+			var rmLocationStr;
+			if($('#brq_rmloc').is(':enabled')){
+				if($('#brq_rmloc :selected').val() == ""){
+					rmLocationStr = "-1^-1";
+				}else{
+					rmLocationStr = (($('#brq_rmloc :selected').val() == "" ? "-1":$('#brq_rmloc :selected').val()) + "^" + ($('#brq_rmloc :selected').text() == "" ? "-1" : $('#brq_rmloc :selected').text()));
+				}
+			}else{
+				rmLocationStr = "-1^-1";
+			}
+			
+			indSec =  ($('#brq_hiring-org :selected').val()+ "^"+  $('#brq_hiring-org :selected').text()) + fieldSeparator
+			+ rmShiftStr + fieldSeparator 
+			+ ($('#brq_prim-job-cat :selected').val() + "^" +$('#brq_prim-job-cat :selected').text()) + fieldSeparator
+			+ rmCityStr + fieldSeparator 
+			+ rmBillingStr + fieldSeparator 
+			+ ($('#brq_fund-src :selected').val() + "^" + $('#brq_fund-src :selected').text())+ fieldSeparator 
+			+ ($('#brq_rmyn :selected').val() + "^" + $('#brq_rmyn :selected').text()) + fieldSeparator
+			+ ($scope.indRmpyrates == "" ? "-1" :$scope.indRmpyrates) + fieldSeparator 
+			+ xferStatus + fieldSeparator 
+			+ rmLocationStr + fieldSeparator
+			+ ($('#brq_isexec :selected').val() + "^" + $('#brq_isexec :selected').text()) + fieldSeparator
+			+ ($('#brq_istl :selected').val() + "^" + $('#brq_istl :selected').text()) + fieldSeparator;
+
+		var strSeparator = ",";
+		var arrSeparator = "~";
+		var roleStr = "";
+					
+		for(var i=0; i < $scope.multiRoleAC.length; i++){
+			roleStr += $scope.multiRoleAC[i].fteperrole + strSeparator
+			+ $scope.multiRoleAC[i].fundingBuId + strSeparator
+			+ $scope.multiRoleAC[i].groupId + strSeparator
+			+ $scope.multiRoleAC[i].beneficiarybuId + strSeparator  
+			+ $scope.multiRoleAC[i].beneficiarySubBrandId + strSeparator
+			+ $scope.multiRoleAC[i].missionId + strSeparator
+			+ $scope.multiRoleAC[i].beneficiaryId + strSeparator
+			+ $scope.multiRoleAC[i].beneficiaryIotId + strSeparator
+			+ $scope.multiRoleAC[i].beneficiaryImtid + strSeparator
+			+ $scope.multiRoleAC[i].regionId + strSeparator
+			+ $scope.multiRoleAC[i].beneficiaryCountryId + strSeparator
+			+ $scope.multiRoleAC[i].programId + strSeparator
+			+ $scope.multiRoleAC[i].fundinglevelBudgetDeploymentId + strSeparator
+			+ $scope.multiRoleAC[i].icafundedId + strSeparator
+			//+ $scope.multiRoleAC[i].departureDate + strSeparator
+			+ ($scope.multiRoleAC[i].departureDate == "-" ? "1/1/1900" : $scope.multiRoleAC[i].departureDate)+ strSeparator
+		//	+ (multiRoleAC.getItemAt(i).dateField == "-" ? "1/1/1900" :  multiRoleAC.getItemAt(i).dateField )+ strSeparator
+		//	 + verticalCb.selectedItem.id + strSeparator 
+			+ $scope.multiRoleAC[i].disciplineId + strSeparator
+			+ $scope.multiRoleAC[i].jobroleId + strSeparator
+			+ $scope.multiRoleAC[i].jobrolespecialitiesId + strSeparator   
+			+ "-1" + strSeparator  //  NEED TO ADD DIAMOND CATEGORY
+			+ "-1" + strSeparator  //  NEED TO ADD DIAMOND NAME
+			//+ $scope.multiRoleAC.getItemAt(i).jobRoleId;RSRC_BRND_VRTCL_MAP_ID
+			+ $scope.multiRoleAC[i].RSRC_BRND_VRTCL_MAP_ID;
+			if(i < ($scope.multiRoleAC.length - 1)){
+				roleStr += arrSeparator;
+			} else {
+				break;
+			}
+		}	
+		
+		var firstSecStr = firstSec.replace(/&/g,'xxampxx');
+		var hriwSecStr = hriwSec.replace(/&/g,'xxampxx');
+		var indSecStr = indSec.replace(/&/g,'xxampxx');
+		var roleStrNew = roleStr.replace(/&/g,'xxampxx');
+		
+		//$scope.save(firstSec,hriwSec,indSec,roleStr);
+		$scope.save(firstSecStr,hriwSecStr,indSecStr,roleStrNew);
+   };  
+   
+   /*
+    * It is the function that will call the service while save button clicked
+    */
+   $scope.save = function(firstSec,hriwSec,indSec,roleStr){
+	   console.log("save ");
+	   var resourseID = Quad3SingleEditService.resourceID;
+	   var loggedInUserEmail = 'maguvvak@in.ibm.com';
+	    if($scope.isMarkedDeparted || $scope.isMarkedTransferOutside){
+			//ro.departResource(firstSec ,hriwSec,indSec,roleStr,__model.loginUserEmailId, __model.resourceId);
+	    	$http.post('./sendflexrequest?action=3rdQuadrant&servletAction=departResource&firstSec='+firstSec+'&hriwSec='+hriwSec+'&indSec='+indSec+'&multiSec='+roleStr+'&loggedInUserEmail='+loggedInUserEmail+'&resourseID='+resourseID).success(function(data, status, headers, config) {
+	       		console.log("save departresource services...");
+	       		//var dbFlag = data.dbFlag;
+	       		//ibmweb.overlay.show('functioanlmgr-overlay1', this);
+	       		$("#loader").css("display","none");
+	    		 }).error(function(data, status, headers, config) {
+	    			 $("#loader").css("display","none");
+	    		 });
+			$scope.isMarkedDeparted = false;
+			$scope.isMarkedTransferOutside = false;
+		} else if ($scope.isMarkedTransfer){
+			//ro.xFerResource(firstSec ,hriwSec,indSec,roleStr,__model.loginUserEmailId, __model.resourceId);
+			$http.post('./sendflexrequest?action=3rdQuadrant&servletAction=xFerResource&firstSec='+firstSec+'&hriwSec='+hriwSec+'&indSec='+indSec+'&multiSec='+roleStr+'&loggedInUserEmail='+loggedInUserEmail+'&resourseID='+resourseID).success(function(data, status, headers, config) {
+	       		console.log("save xFerResources services...");
+	       		//var dbFlag = data.dbFlag;
+	       		//ibmweb.overlay.show('functioanlmgr-overlay1', this);
+	       		$("#loader").css("display","none");
+	    		 }).error(function(data, status, headers, config) {
+	    			 $("#loader").css("display","none");
+	    		 });
+			$scope.isMarkedTransfer = false;
+		} else {
+			if(Quad3SingleEditService.editFlag){
+				var editValue = "1";
+				$http.post('./sendflexrequest?action=3rdQuadrant&servletAction=editResource&firstSec='+firstSec+'&hriwSec='+hriwSec+'&indSec='+indSec+'&multiSec='+roleStr+'&loggedInUserEmail='+loggedInUserEmail+'&resourseID='+resourseID+'&falloutFlag='+editValue).success(function(data, status, headers, config) {
+		       		console.log("save editResource services...");
+		       		console.log("data");
+		       		console.log(data);
+		       		var passFlag = data.passFlag;
+		       		if(passFlag == true){
+			       		$scope.showAlert(APPCONSTANTS.UPDATE_REQ_SUBMITTED_DO_NOTHING);
+			       		return false;
+		       		}else if(passFlag == false){
+		       			$scope.showAlert(data.message);
+		       			return false;
+		       		}
+		       		//ibmweb.overlay.show('functioanlmgr-overlay1', this);
+		       		$("#loader").css("display","none");
+		    		 }).error(function(data, status, headers, config) {
+		    			 $("#loader").css("display","none");
+		    		 });
+			//	ro.editResource(firstSec ,hriwSec,indSec,roleStr,__model.loginUserEmailId, __model.resourceId,editValue);
+			}
+		}	
+   };
+   
+   /*
+    * BRQ single selection/copy status overlay 'yes' button func call
+    */
+   $scope.statusOverlayYesBtn = function(ybtn){
+	   console.log("statusOverlayYesBtn");
+	  if($scope.stmsg == "msgOnbrd"){
+		  $scope.recordTransferOutside(ybtn);
+	  }else if($scope.stmsg == "msgOnbrd1"){
+		  $scope.recordTransfer(ybtn);
+	  }else if($scope.stmsg == "msgDepart"){
+		  $scope.recordDepart(ybtn);
+	  }else if($scope.stmsg == "msgDelete"){
+		  $scope.recordDelete(ybtn);
+	  }
+   };
+   /*
+    * BRQ single selection/copy status overlay 'no' button func call
+    */
+   $scope.statusOverlayNoBtn = function(nbtn){
+	   console.log("statusOverlayNoBtn");
+	   if($scope.stmsg == "msgOnbrd"){
+ 		  $scope.recordTransferOutside(nbtn);
+ 	  }else if($scope.stmsg == "msgOnbrd1"){
+ 		  $scope.recordTransfer(nbtn);
+ 	  }else if($scope.stmsg == "msgDepart"){
+ 		  $scope.recordDepart(nbtn);
+ 	  }else if($scope.stmsg == "msgDelete"){
+ 		  $scope.recordDelete(nbtn);
+ 	  }
+   };
+   
+   $scope.recordTransferOutside = function(ynbtn){
+	   if(ynbtn == "yes"){
+			$scope.isSaveButtonEnabled = true;
+			$scope.isMarkedTransferOutside = true;
+			$scope.trancferText = APPCONSTANTS.RECORD_MARKED_FOR_XFER_OUTSIDE;
+			$scope.selectedXferTypeId =  $("#brq_status :selected").val();
+			$scope.selectedXferTypeLabel = $("#brq_status :selected").text();
+			ibmweb.overlay.hide('statusChngOverlay', this);
+			//statusCb.selectedIndex = 5;
+		} else {
+			$scope.isMarkedTransferOutside = false;
+			$scope.selectedStatus = $scope.initialStatus;
+			ibmweb.overlay.hide('statusChngOverlay', this);
+		}
+   };
+   $scope.recordTransfer = function(ynbtn){
+	   if(ynbtn == "yes"){
+		    $scope.isSaveButtonEnabled = true;
+			$scope.isXferWithinMnCFlag = true;
+			$scope.isMarkedTransfer = true;
+			$scope.trancferText = APPCONSTANTS.RECORD_MARKED_FOR_TRANSFER;
+			$scope.selectedXferTypeId = $("#brq_status :selected").val();
+			$scope.selectedXferTypeLabel = $("#brq_status :selected").text();
+			ibmweb.overlay.hide('statusChngOverlay', this);
+			/*if(__model.isAdmin || __model.isSuperUser){
+				statusCb.selectedIndex = 5;
+			}else{
+				statusCb.selectedIndex = 4;
+			}
+			
+			var __dbModel:DashboardModel = new DashboardModel();
+			__dbModel.loadDashboardBottRightAddnew();
+			
+			XferWithAccesMethod((__model.botrightallAccesXferXml));*/
+		} else {
+			$scope.isMarkedTransfer = false;
+			$scope.selectedStatus = $scope.initialStatus;
+			$scope.isXferWithinMnCFlag = false;
+			ibmweb.overlay.hide('statusChngOverlay', this);
+		}
+   };
+   $scope.recordDepart = function(ynbtn){
+	   if(ynbtn == "yes"){
+			$scope.isSaveButtonEnabled = true;
+			$scope.isMarkedDeparted = true;
+			if($scope.isRmOnly && $scope.isSuperUser){
+				$scope.trancferText = APPCONSTANTS.RECORD_MARKED_FOR_DEPARTURE + APPCONSTANTS.PROVIDE_DEP_REASON;
+			} else if($scope.isRmOnly && !$scope.isSuperUser){
+				$scope.trancferText = APPCONSTANTS.RECORD_MARKED_FOR_DEPARTURE + APPCONSTANTS.PROVIDE_DEP_REASON;
+				
+			} else if(!$scope.isRmOnly && !$scope.isSuperUser){
+				trancferText = APPCONSTANTS.RECORD_MARKED_FOR_DEPARTURE;
+			} else if(!$scope.isRmOnly && $scope.isSuperUser){
+				trancferText = APPCONSTANTS.RECORD_MARKED_FOR_DEPARTURE + APPCONSTANTS.PROVIDE_DEP_REASON;
+			}
+			ibmweb.overlay.hide('statusChngOverlay', this);
+		} else {
+			//statusCb.selectedIndex = 0;	
+			$scope.selectedStatus = $scope.initialStatus;
+			ibmweb.overlay.hide('statusChngOverlay', this);
+		}
+   };
+   
+   $scope.ro_resultHandler = function(data){
+	 console.log("ro_resultHandler....");
+	 var passFlag = data.passFlag;
+	 /*if(passFlag == "false"){
+		 
+	 }else{*/
+		 $scope.isMarkedDelete = false;
+		 $scope.isMarkedDeparted = false;
+		 $scope.isMarkedTransfer = false;
+		 $scope.isMarkedTransferOutside = false;
+		 
+		 $scope.isAddButtonClicked = false;
+		 $scope.isEditButtonClicked = false;
+		 $scope.isCopyButtonClicked = false;
+		 
+		 var radioBtn = $("input:radio[name=radioinp2]:checked").next().text();
+		 if(radioBtn == "Do nothing"){
+			 $scope.isSaveButtonEnabled = false;
+			 $scope.showBottomRight = false;
+			 $scope.resetdefaults();
+			 $scope.showAlert(APPCONSTANTS.UPDATE_REQ_SUBMITTED_DO_NOTHING);
+		 }else if(radioBtn == "Refresh Quadrant 1,2"){
+			 console.log("Refresh Quadrant 1,2");
+			 console.log("Master getsecondary data......");
+			 console.log($scope.quadLevelId);
+			 console.log(MasterDataService.getSecondarydata());
+			 $scope.resetdefaults();
+			 $rootScope.$broadcast ('onMenuDataLoadComplete');
+			 $scope.showBottomRight = false;
+			 $scope.showAlert(APPCONSTANTS.UPDATE_REQ_SUBMITTED);
+		 }
+	 //}
+   };
+   
+   $scope.resetdefaults = function(){
+	 console.log("reset defaults...");
+	 $scope.selectedIndgroup = "";
+	 $scope.notesId = "";
+	 $scope.firstName = "";
+	 $scope.lastName = "";
+	 $scope.actHeadCount = "";
+	 $scope.dateRole = "";
+	 $scope.functMgr = "";
+	 $scope.jobResponsibilites = "";
+	 $scope.globMgr = "";
+	 $scope.comments = "";
+	 
+	 // HRIW SECTION
+	 $scope.physicalLocationIOT = "";
+	 $scope.hriwPhysicalLocIot = "";
+	 $scope.hriwEmpType = "";
+	 $scope.hriwemptype = "";
+	 $scope.hriwjobcatCodeName = "";
+	 $scope.hriwaccdept = "";
+	 $scope.hriwintranetId = "";
+	 $scope.hriwBPworklocCode = "";
+	 $scope.physicalLocationIMT = "";
+	 $scope.hriwphysicalLocImt = "";
+	 $scope.ismgrId = "";
+	 $scope.hriwIsmgr = "";
+	 $scope.hriwFinacialQualifier = "";
+	 $scope.hriwCountryNum = "";
+	 $scope.hriwRepMgr = "";
+	 $scope.hriwBpworkplaceInd = "";
+	 $scope.countryOfResidence = "";
+	 $scope.hriwCountryRes = "";
+	 $scope.hriwAccMgr = "";
+	 $scope.hriwWorkperiodScheduled = "";
+	 $scope.hriwSerialNum = "";
+	 
+	 //Individual
+	 $scope.selectedPrimjobcat = "";
+	 $scope.selectedFundSrc = "";
+	 $scope.selectedStatus = "";
+	 $scope.selecteddeptReason = "";
+	 $scope.selectedHiringOrg = "";
+	 $scope.selectedExec = "";
+	 $scope.selectedTl = "";
+	 $scope.selectedRmyn = "";
+	 $scope.selectedRmcity = "";
+	 $scope.selectedRmloc = "";
+	 $scope.selectedRmshift = "";
+	 $scope.selectedRmbilltype = "";
+	 $scope.indRmpyrates = "";
+	 
+	 $scope.multiRoleAC.length = 0;
+	 $scope.isSaveButtonEnabled = false;
+	 $scope.isupdateExistBtnclicked = false;
+	 if($scope.isXferWithinMnCFlag){
+			$scope.isXferWithinMnCFlag = false;
+			//botRightAddPopFundingBuAc = null;
+			/*var __dbModel:DashboardModel = new DashboardModel();
+			__dbModel.loadDashboardBottRightAddnew();*/
+			//commanMethod((__model.botrightallAccesXferXml));
+		}
+   };
+   
+   $scope.recordDelete = function(ynbtn){
+	   if(ynbtn == "yes"){
+			// TBD
+			$scope.isSaveButtonEnabled = true;
+			$scope.isMarkedDelete = true;
+			var statusID = $('#brq_status').val();
+			var resourseID = Quad3SingleEditService.resourceID;
+			var loggedInUserEmail = 'maguvvak@in.ibm.com';
+			$http.post('./sendflexrequest?action=3rdQuadrant&servletAction=markDeleteResource&loggedInUserEmail='+loggedInUserEmail+'&resourceID='+resourseID+'&status='+statusID).success(function(data, status, headers, config) {
+	       		console.log("record delete services ...");
+	       		console.log("data");
+	       		console.log(data);
+	       		$scope.ro_resultHandler(data);
+	       		/*var passFlag = data.passFlag;
+	       		if(passFlag == true){
+		       		$scope.showAlert(APPCONSTANTS.UPDATE_REQ_SUBMITTED_DO_NOTHING);
+		       		return false;
+	       		}else if(passFlag == false){
+	       			$scope.showAlert(data.message);
+	       			return false;
+	       		}*/
+	       		//ibmweb.overlay.show('functioanlmgr-overlay1', this);
+				  ibmweb.overlay.hide('statusChngOverlay', this);
+	       		$("#loader").css("display","none");
+	    		 }).error(function(data, status, headers, config) {
+	    			 $("#loader").css("display","none");
+	    	  });
+			  ibmweb.overlay.hide('statusChngOverlay', this);
+			//ro.markDeleteResource(__model.resourceId, String(statusCb.selectedItem.id), __model.loginUserEmailId);
+		} else {
+			$scope.isMarkedDelete = false;
+			$scope.selectedStatus = $scope.initialStatus;
+			ibmweb.overlay.hide('statusChngOverlay', this);
+		}
+   };
+   /*
+    * BRQ single selection/copy status dropdown onchange func
+    */
+   $scope.statusCbhandler = function(){
+	    var msgOnbrd = APPCONSTANTS.RECORD_WILLBE_MARKED_FOR_TRANSFER;
+	    var msgDepart = APPCONSTANTS.CHANGE_STATUS_DEPARTED;
+	    var msgDelete = APPCONSTANTS.CHANGE_STATUS_DELETE;
+	    console.log("status cb handler...");
+	    $("#saveBtn").attr("disabled", false);
+	    var isStatusChangeFlag = true;
+	    //statusImg.source = ApplicationConstants.BLUE_STAR;
+		/*var msgOnbrd:String = ApplicationConstants.RECORD_WILLBE_MARKED_FOR_TRANSFER;
+		var msgDepart:String = ApplicationConstants.CHANGE_STATUS_DEPARTED;
+		var msgDelete:String = ApplicationConstants.CHANGE_STATUS_DELETE;
+		__model.isStatusChangeFlag = true;*/
+		if($("#brq_status :selected").text() == "X-fer outside M&C"){
+					if($scope.unDeleteStatus == "Delete" || $scope.unDeleteStatus == "X-fer outside M&C" || $scope.unDeleteStatus == "Departed (Left IBM)"){
+						commnfunctionForresteStatus();
+					}else{
+						$scope.statusOverlayMsg = msgOnbrd;
+						$scope.stmsg = "msgOnbrd";
+						ibmweb.overlay.show('statusChngOverlay', this);
+					}
+		} else if($("#brq_status :selected").text() == "X-fer within M&C"){
+			//xfer
+					if($scope.unDeleteStatus == "Delete" || $scope.unDeleteStatus == "X-fer outside M&C" || $scope.unDeleteStatus == "Departed (Left IBM)"){
+						commnfunctionForresteStatus();
+					}else{
+						$scope.statusOverlayMsg = msgOnbrd;
+						$scope.stmsg = "msgOnbrd1";
+						ibmweb.overlay.show('statusChngOverlay', this);
+					}
+		} else if($("#brq_status :selected").text() == "Departed (Left IBM)"){
+			//departure
+					if($scope.unDeleteStatus == "Delete" || $scope.unDeleteStatus == "X-fer outside M&C" || $scope.unDeleteStatus == "Departed (Left IBM)"){
+						commnfunctionForresteStatus();
+					}else{
+						$scope.statusOverlayMsg = msgDepart;
+						$scope.stmsg = "msgDepart";
+						ibmweb.overlay.show('statusChngOverlay', this);
+					}
+		} else if($("#brq_status :selected").text() == "Delete"){
+					if($scope.unDeleteStatus == "Delete" || $scope.unDeleteStatus == "X-fer outside M&C" || $scope.unDeleteStatus == "Departed (Left IBM)"){
+						commnfunctionForresteStatus();
+					}else{
+						//Delete
+						$scope.statusOverlayMsg = msgDelete;
+						$scope.stmsg = "msgDelete";
+						ibmweb.overlay.show('statusChngOverlay', this);
+					}
+		} else {
+				if($scope.unDeleteStatus == "Delete" || $scope.unDeleteStatus == "X-fer outside M&C" || $scope.unDeleteStatus == "Departed (Left IBM)"){
+						commnfunctionForresteStatus();
+				}else{
+					
+				}
+		}
+		$scope.trancferText = "";
+  };
+  
+  $scope.commnfunctionForresteStatus = function(){
+      console.log("commnfunctionForresteStatus");    	   
+	   var statusAc = $scope.status;
+	   var msgDelete = "";
+	   for(var i = 0; i < statusAc.length; i++){
+			if(statusAc[i].desc == $("#brq_status :selected").text()){
+				msgDelete = "Restore current record form" + "<b>&nbsp; " + $scope.unDeleteStaus +  "</b> " + "to" + "<b>&nbsp;" + $("#brq_status :selected").text() +"</b>"+".";
+				break;
+			}
+		}
+	    $scope.showAlert(msgDelete);
+		//IUITextField(alert.alertForm.textField).htmlText = msgDelete;
+  };
+  
+  /*
+   * BRQ single selection/copy RM(Yes/No) change event
+   */
+   $scope.indRMynChangeEvent = function(){
+   	console.log("indRMynChangeEvent");
+   	if($("#brq_rmyn :selected").text() == "Yes" || $scope.selectedRmyn == "205"){
+   		 $scope.rmcityFlag = false;
+   	     $scope.rmlocFlag = false;
+   	     $scope.rmshiftFlag = false;
+   	     $scope.rmbillingtypeFlag = false;
+   	     $scope.indRMynFlag = true;
+   	}else{
+   		 $scope.rmcityFlag = true;
+   	     $scope.rmlocFlag = true;
+   	     $scope.rmshiftFlag = true;
+   	     $scope.rmbillingtypeFlag = true;
+   	     $scope.indRMynFlag = true;
+   	
+   	     $scope.selectedRmcity = "";
+   	     $scope.selectedRmloc = "";
+   	     $scope.selectedRmshift = "";
+   		 $scope.selectedRmbilltype = "";
+   	}
+   	if($scope.indRMynFlag != false){
+       $("#saveBtn").attr("disabled", false);
+    }else{
+       $("#saveBtn").attr("disabled", true);
+    }
+   };
+   
+   /*
+    * BRQ single selection/copy notes Id validation func call
+    */
+   $scope.notesIdVal = function(){
+   	console.log("notesId validation");
+   	$("#saveBtn").attr("disabled", false);
+   	if($('#brq_notesid').val() == ""){
+   		$scope.showAlert(APPCONSTANTS.ENTER_NOTES_ID);
+   		return false;
+   	}
+   	var notesid = $scope.notesId;
+   	$scope.notesvalHeaderArr = [];
+   	$scope.notesvalGridDetails = [];
+   	$scope.notesvaloverlaygridoptions = {resizable: true};
+    $scope.notesvaloverlaygridoptions.columnDefs = [];
+   	$("#loader").css("display","block");
+   	$http.post('./sendflexrequest?action=3rdQuadrant&servletAction=retrieveBPDATA&notesid='+notesid+"&doCompress=false").success(function(data, status, headers, config) {
+   		 //$("#loader").css("display","none");
+   		console.log("notes id validation... console...");
+   		console.log(data);
+   		$scope.notesvalDbFlag = data.dbFlag;
+   		$scope.notesvalNotesId = data.notesID;
+           $scope.notesvalDbmsg = data.dbMessage;
+           $scope.notesvalFirstName = data.firstName;
+           $scope.notesvalLastName = data.lastName;
+           $scope.notesvalFuncMgr = data.functionalManager;
+           $scope.notesvalJobResp = data.jobResponsibilities;
+           $scope.notesvalIsmgr = data.isManagerValue;
+           $scope.notesvalCountryRes = data.countryOfResidenceValue;
+           $scope.notesvalCountryNum = data.countryNumberValue;
+           $scope.notesvalSerno = data.serialNumber;
+           $scope.notesvalReprMgr = data.reportingManager;
+           $scope.notesvalIntranetId = data.intranetID;
+           $scope.notesvalBpworklocCode = data.bpWorkLocationCode;
+           $scope.notesvalBpworkIndicator = data.bpWorkLocationInd;
+           $scope.errorMsg = data.message;
+           $scope.notesvalHeaderArr = ["Status","Date","Funding Bu","Sub Brand","Beneficiary IMT","Beneficiary Country"];
+           if(data.dbFlag == "true"){
+        	   
+                	for (var i = 0; i < $scope.notesvalHeaderArr.length; i++) {
+			   			$scope.notesvaloverlaygridoptions.columnDefs.push({
+				  			     field: $scope.notesvalHeaderArr[i],
+				  			     width:118,
+				  			     enablePinning:false,
+				  			     headerTooltip:true,
+				  			     cellTooltip:true
+				  		});
+		 		};
+		 		
+	        	$scope.notesvalGridDetails = [];
+	        	var messageArray = data.messageArray;
+                for(var i=0; i<messageArray.length; i++){
+                	var obj = {};
+                	var objArr = [];
+                	objArr = messageArray[i].lv_desc.split("^");
+                	obj["Status"] = objArr[0];
+                	obj["Date"] = objArr[1];
+                	obj["Funding Bu"] = objArr[2];
+                	obj["Sub Brand"] = objArr[3];
+                	obj["Beneficiary IMT"] = objArr[4];
+                	obj["Beneficiary Country"] = objArr[5];
+                	$scope.notesvalGridDetails.push(obj);
+                }
+                $scope.notesvaloverlaygridoptions.data = $scope.notesvalGridDetails;
+                ibmweb.overlay.show('notes-validation-overlay', this);
+                /*$timeout( function(){
+                	$(window).resize();
+                  	if (!$scope.$$phase) $scope.$apply();
+                }, 1000);*/
+                
+                $interval(function () {
+                	$(window).resize();
+                }, 100); 
+           }else if(data.dbFlag == "false"){
+        	   $scope.showAlert($scope.errorMsg);
+        	   $("#loader").css("display","none");
+        	   return false;
+           }else{
+           	ibmweb.overlay.show('notes-validation-overlay1', this);
+           }
+           $("#loader").css("display","none");
+		 }).error(function(data, status, headers, config) {
+			 $("#loader").css("display","none");
+			 ibmweb.overlay.hide('notesvalgridoptions', this);
+		 });
+   };
+  /*
+   * BRQ single selection/copy Notes Id validation overlay 'yes' button func call
+   */ 
+   $scope.notesValYesBtn = function(){
+   	 console.log("notesVal yes button");
+   	 $scope.notesId = $scope.notesvalNotesId;
+   	 $scope.firstName = $scope.notesvalFirstName;
+   	 $scope.lastName = $scope.notesvalLastName;
+   	 $scope.functMgr = $scope.functMgr;
+   	 $scope.jobResponsibilites = $scope.notesvalJobResp;
+   	 $scope.globMgr = $scope.notesvalReprMgr;
+   	 $scope.isNotesValFlag = true;
+     ibmweb.overlay.hide('notes-validation-overlay', this);
+   };
+   /*
+    * BRQ single selection/copy Notes Id validation overlay 'no' button func call
+    */
+   $scope.notesValNoBtn = function(){
+   	 console.log("notes val no button");
+   	$scope.isNotesValFlag = false;
+   	 ibmweb.overlay.hide('notes-validation-overlay', this);
+   };
+   
+   $scope.notesValYesBtn1 = function(){
+     	 console.log("notesVal yes button");
+     	 $scope.notesId = $scope.notesvalNotesId;
+     	 $scope.firstName = $scope.notesvalFirstName;
+     	 $scope.lastName = $scope.notesvalLastName;
+     	 $scope.functMgr = $scope.functMgr;
+     	 $scope.jobResponsibilites = $scope.notesvalJobResp;
+     	 $scope.globMgr = $scope.notesvalReprMgr;
+     	 $scope.isNotesValFlag = true;
+         ibmweb.overlay.hide('notes-validation-overlay1', this);
+     };
+     
+     $scope.notesValNoBtn1 = function(){
+     	 console.log("notes val no button");
+     	 $scope.isNotesValFlag = false;
+     	 ibmweb.overlay.hide('notes-validation-overlay1', this);
+     };
+   
+     /*
+      * BRQ single selection/copy Functional manager validation func
+      */
+   $scope.functionalMgrVal = function(){
+   	console.log("functional manager validation function");
+   	$("#saveBtn").attr("disabled", false);
+   	if($('#brq_funct_manager').val()==""){
+   		$scope.showAlert(APPCONSTANTS.FN_MGR_VALUE_EMPTY);
+   		return false;
+   	}
+   	$("#loader").css("display","block");
+   	var notesid = $scope.functMgr;
+   	$http.post('./sendflexrequest?action=3rdQuadrant&servletAction=retrieveBPDATA&notesid='+notesid+"&doCompress=false").success(function(data, status, headers, config) {
+   		console.log("functional manager validation... console...");
+   		var dbFlag = data.dbFlag;
+   		if(dbFlag == "true"){
+                $scope.functionalMgrNotesId = data.notesID;
+                $scope.functionalMgrfirstName = data.firstName;
+                $scope.functionalMgrlastName = data.lastName;
+                ibmweb.overlay.show('functioanlmgr-overlay', this);
+   		}else{
+   			ibmweb.overlay.show('functioanlmgr-overlay1', this);
+   		}
+   		$("#loader").css("display","none");
+		 }).error(function(data, status, headers, config) {
+			 $("#loader").css("display","none");
+		 });
+   };
+   
+   /*
+    * BRQ single selection/copy Functional manager validation overlay 'yes' button func call
+    */
+   $scope.functionalMgrYesBtn = function(val){
+   	if(val == 'yes'){
+   		/*$scope.functMgr = $scope.functionalMgrNotesId;
+   		$scope.firstName = $scope.functionalMgrfirstName;
+   		$scope.lastName = $scope.functionalMgrlastName;*/
+   		ibmweb.overlay.hide('functioanlmgr-overlay', this);
+   	}else{
+   		ibmweb.overlay.hide('functioanlmgr-overlay1', this);
+   	}
+   };
+   /*
+    * BRQ single selection/copy Functional manager validation overlay 'no' button func call
+    */
+   $scope.functionalMgrNoBtn = function(val){
+   	if(val == 'no'){
+   		ibmweb.overlay.hide('functioanlmgr-overlay', this);
+   	}else{
+   		ibmweb.overlay.hide('functioanlmgr-overlay1', this);
+   	}
+   };
+   
+   $scope.showAddNewRecordView = function(){
+   	$("#bottomRightQuad").hide();
+   	$("#bottomRightQuad_new").show();
+   };
+   /*
+    * FTE per role validate func call
+    */
+   $scope.validateFte = function(){
+   	console.log("validate FTE...");
+   	var isValidFTE;
+		var multiplesAC = [];
+		multiplesAC = $scope.multiRoleAC;
+		var fteTotal = 0;
+		for(var i = 0; i < multiplesAC.length; i++){
+			fteTotal += parseFloat(multiplesAC[i].fteperrole);
+		}
+		fteTotal += parseFloat($('#addroleRecordOverlay #fteperrole').val());
+		if($('#addroleRecordOverlay #brq_ind-group :selected').text() == "Group"){
+			$scope.actHeadCount = fteTotal.toFixed(2);
+			isValidFTE = true;
+		} else {
+			if(fteTotal <= 1.0){
+				isValidFTE = true;
+				$scope.actHeadCount = fteTotal.toFixed(2);
+			} else {
+				isValidFTE = false;
+			}
+		}
+		return isValidFTE;
+   };
+   /*
+    * click on submit button in insert record overlay
+    */
+   $scope.submitBtnHandler = function(){
+       console.log("submit button handler");
+       var isSubBrand2selected = false;
+       if($scope.mode == "edit"){
+           for(var i=0; i<$scope.multiRoleAC.length; i++){
+ 			   if($scope.multiRoleAC[i].isChecked == true){
+ 				  $scope.RSRC_BRND_VRTCL_MAP_ID = $scope.multiRoleAC[i].RSRC_BRND_VRTCL_MAP_ID;
+ 				  $scope.multiRoleAC.splice(i,1);
+ 			   }
+ 		   }
+       }
+       
+       if($('#addroleRecordOverlay #fteperrole').val() != "" && 
+     		  $('#addroleRecordOverlay #funding-bu :selected').val() != "" && 
+     		  $('#addroleRecordOverlay #beneficiary-bu :selected').val() != "" && 
+     		  $('#addroleRecordOverlay #mission :selected').val() != "" &&
+     		  $('#addroleRecordOverlay #jobrole-specialities :selected').val() != "" && 
+				  $('#addroleRecordOverlay #fundlevel-budgetdeployment :selected').val() != "" && 
+				  $('#addroleRecordOverlay #beneficiary :selected').val() != "" && 
+				  $('#addroleRecordOverlay #beneficiary-iot :selected').val() != "" && 
+				  $('#addroleRecordOverlay #beneficiary-imt :selected').val() != "" &&
+				  $('#addroleRecordOverlay #beneficiary-country :selected').val() != "" &&
+				  $('#addroleRecordOverlay #discipline :selected').val() != "" &&
+				  $('#addroleRecordOverlay #fundlevel-budgetdeployment :selected').val() != "" &&
+				  $('#addroleRecordOverlay #ica-funded :selected').val() != "" &&
+				  $('#addroleRecordOverlay #jobrole :selected').val() != "" &&
+					(!($('#addroleRecordOverlay #beneficiary-sub-brand').is(':enabled') && $('#addroleRecordOverlay #beneficiary-sub-brand :selected').val() == "")) &&
+				  $('#addroleRecordOverlay #jobrole-specialities :selected').val() != ""){
+	        	  if((!$('#addroleRecordOverlay #beneficiary-sub-brand').is(':enabled')) || (!$('#addroleRecordOverlay #region').is(':enabled')) || (!$('#addroleRecordOverlay #group').is(':enabled')))
+	        	  {
+	        		  var isValidFte = false;
+	        		  isValidFte = $scope.validateFte();
+	        		  if(isValidFte){
+							if($('#addroleRecordOverlay #status :selected').text() == "On Board" && parseFloat($('#addroleRecordOverlay #fteperrole').val()) <= 0.00){
+								$scope.showAlert(APPCONSTANTS.VALIDATION_FOR_ONBOARD_AND_GREATER_THAN_ONE);
+								return false;
+							}else{
+								$scope.isSaveButtonEnabled = true;
+								/*this.dispatchEvent(new Event("submit"));	
+								FlexGlobals.topLevelApplication.bottomRight.ftedg.height += ApplicationConstants.DG_ROW_HEIGHT;*/
+							}
+						} else {
+							$scope.showAlert(APPCONSTANTS.FTE_CANT_EXCEED_1);
+							return false;
+						}
+	        	   }else{
+	        		   if($('#addroleRecordOverlay #beneficiary-sub-brand :selected').val() == "" || $('#addroleRecordOverlay #region :selected').val() == "" || $('#addroleRecordOverlay #group :selected').val() == ""){
+							if($('#addroleRecordOverlay #beneficiary-sub-brand :selected').val() == "" && $('#addroleRecordOverlay #beneficiary-sub-brand').is(':enabled')){
+							    $scope.showAlert(APPCONSTANTS.SELECT_VALUE_SUBBRAND2);
+							    return false;
+							} else if($('#addroleRecordOverlay #region :selected').val() == "" && $('#addroleRecordOverlay #region').is(':enabled')){
+								$scope.showAlert(APPCONSTANTS.SELECT_VALUE_BENEFICIARY_GMR);
+								return false;
+							}else if($('#addroleRecordOverlay #group :selected') == "" && $('#addroleRecordOverlay #group').is(':enabled')){
+								$scope.showAlert(APPCONSTANTS.SELECT_VALUE_GROUP);
+								return false;
+							}
+						}else{
+								isValidFte = $scope.validateFte();
+								if(isValidFte){
+									if($('#addroleRecordOverlay #status :selected').text() == "On Board" && parseFloat($('#addroleRecordOverlay #fteperrole').val()) <= 0.00){
+										$scope.showAlert(APPCONSTANTS.VALIDATION_FOR_ONBOARD_AND_GREATER_THAN_ONE);
+										return false;
+									}else{
+										$scope.isSaveButtonEnabled = true;
+										/*this.dispatchEvent(new Event("submit"));	
+										FlexGlobals.topLevelApplication.bottomRight.ftedg.height += ApplicationConstants.DG_ROW_HEIGHT;*/
+									}
+								} else {
+									 $scope.showAlert(APPCONSTANTS.FTE_CANT_EXCEED_1);	
+									 return false;
+								}
+						}
+	        	   }
+	            }else{
+	        	if($('#addroleRecordOverlay #fteperrole').val() == ""){
+	        		$scope.showAlert(APPCONSTANTS.ENTER_FTE_VALUE);
+	        		return false;
+	        	}else if($('#addroleRecordOverlay #funding-bu :selected').val() == ""){
+	        		$scope.showAlert(APPCONSTANTS.SELECT_FUNDING_BU);
+	        		return false;
+	        	}else if($('#addroleRecordOverlay #beneficiary-bu :selected').val() == ""){
+	        		if($('#addroleRecordOverlay #funding-bu :selected').text() == "SWG" && $('#addroleRecordOverlay #group :selected').val() == ""){
+	        			$scope.showAlert(APPCONSTANTS.SELECT_VALUE_GROUP);
+	        			return false;
+	        		}else{
+	        			$scope.showAlert(APPCONSTANTS.SELECT_SUBBRAND_VALUE);
+	        			return false;
+	        		}
+	        	}else if($('#addroleRecordOverlay #mission :selected').val() == ""){
+	        		$scope.showAlert(APPCONSTANTS.SELECT_MISSION_VALUE);
+	        		return false;
+	        	}else if($('#addroleRecordOverlay #beneficiary :selected').val() == ""){
+	        		$scope.showAlert(APPCONSTANTS.SELECT_BENEFICIARY_VALUE);
+	        		return false;
+	        	}else if($('#addroleRecordOverlay #beneficiary-iot :selected').val() == ""){
+	        		$scope.showAlert(APPCONSTANTS.SELECT_BENEFICIARY_IOTGMU);
+	        		return false;
+	        	}else if($('#addroleRecordOverlay #beneficiary-imt :selected').val() == ""){
+	        		$scope.showAlert(APPCONSTANTS.SELECT_BENEFICIARY_IOTGMT);
+	        		return false;
+	        	}else if($('#addroleRecordOverlay #beneficiary-country :selected').val() == ""){
+	        		$scope.showAlert(APPCONSTANTS.SELECT_BENEFICIARY_COUNTRY);
+	        		return false;
+	        	}else if($('#addroleRecordOverlay #jobrole-specialities :selected').val() == ""){
+	        		$scope.showAlert(APPCONSTANTS.SELECT_CATEGORIES);
+	        		return false;
+	        	}else if($('#addroleRecordOverlay #discipline :selected').val() == ""){
+	        		$scope.showAlert(APPCONSTANTS.SELECT_VERTICAL_VALUE);
+	        		return false;
+	        	}else if($('#addroleRecordOverlay #jobrole :selected').val() == ""){
+	        		$scope.showAlert(APPCONSTANTS.SELECT_JOBROLE_SUBVERT_VALUE);
+	        		return false;
+	        	}else if($('#addroleRecordOverlay #jobrole-specialities :selected').val() == ""){
+	        		$scope.showAlert(APPCONSTANTS.SELECT_JOBROLE_SPECIALITY_VALUE);
+	        		return false;
+	        	}else if($('#addroleRecordOverlay #fundlevel-budgetdeployment :selected').val() == ""){
+	        		$scope.showAlert(APPCONSTANTS.SELECT_FUNDINGLEVEL_BUDGET_VALUE);
+	        		return false;
+	        	}else if($('#addroleRecordOverlay #ica-funded :selected').val() == ""){
+	        		$scope.showAlert(APPCONSTANTS.SELECT_ICA_FUNDED_VALUE);
+	        		return false;
+	        	}else if($('#addroleRecordOverlay #beneficiary-sub-brand :selected').val() == ""){
+	        		$scope.showAlert(APPCONSTANTS.SELECT_VALUE_SUBBRAND2);
+	        		return false;
+	        	}else{
+	        		$scope.showAlert(APPCONSTANTS.SELECT_ALL_VALUES_DEFAULT);
+	        		return false;
+	        	}
+     }	
+     	var obj = {};
+     	var brqmulRoleobj = {};
+ 		if($scope.mode == "add"){
+ 			
+ 			brqmulRoleobj.fteperrole = obj["FTE PerRole"] = $scope.FTEPerRole;;
+ 			brqmulRoleobj.fundingBu = obj["Funding BU"] = $scope.getDesToAddRecordGrid($scope.insertSelectedFundingBU,$scope.multiplesFundingBU);
+ 			brqmulRoleobj.fundingBuId = $scope.insertSelectedFundingBU == null || undefined ? "-1" : $scope.insertSelectedFundingBU;
+ 			
+ 			brqmulRoleobj.group = obj["Group"] = "-";
+ 			brqmulRoleobj.groupId = "-1";
+ 			
+ 			brqmulRoleobj.beneficiarybu = obj["Beneficiary BU"] = $scope.getDesToAddRecordGrid($scope.insertSelectedBeneficiaryBU,$scope.multipleBeneficiaryBU);
+ 			brqmulRoleobj.beneficiarybuId = $scope.insertSelectedBeneficiaryBU == "-" ? "-1" : $scope.insertSelectedBeneficiaryBU;
+     		//obj["Beneficiary SubBrand"] = $scope.getDesToAddRecordGrid($scope.insertSelectedBeneficiaryBU,$scope.multipleBeneficiarySubBrand);
+     		
+ 			brqmulRoleobj.beneficiarySubBrand = obj["Beneficiary SubBrand"] = $scope.getDesToAddRecordGrid($scope.insertSelectedBeneficiarySubBrand,$scope.multipleBeneficiarySubBrand);
+ 			brqmulRoleobj.beneficiarySubBrandId = $scope.insertSelectedBeneficiarySubBrand == "-" ? "-1" : $scope.insertSelectedBeneficiarySubBrand;
+ 			
+ 			//obj1.beneficiarySubBrand = obj["Beneficiary SubBrand"] = "-";
+     		//obj["Beneficiary SubBrand"] = $scope.getDesToAddRecordGrid("3230",$scope.multipleBeneficiarySubBrand);
+ 			
+ 			brqmulRoleobj.mission = obj["Mission"] = $scope.getDesToAddRecordGrid($scope.insertSelectedMission,$scope.multiplesMission);
+ 			brqmulRoleobj.missionId = $scope.insertSelectedMission == "-" ? "-1" : $scope.insertSelectedMission;
+ 			
+ 			brqmulRoleobj.beneficiary = obj["Beneficiary"] = $scope.getDesToAddRecordGrid($scope.insertSelectedBeneficiary,$scope.newMultiplesBeneficiary);
+ 			brqmulRoleobj.beneficiaryId = $scope.insertSelectedBeneficiary == "-" ? "-1" : $scope.insertSelectedBeneficiary;
+ 			
+ 			brqmulRoleobj.beneficiaryIot = obj["Beneficiary IOT"] = $scope.getDesToAddRecordGrid($scope.insertSelectedBeneficiryIOT,$scope.multipleBeneficiaryIOT);
+ 			brqmulRoleobj.beneficiaryIotId = $scope.insertSelectedBeneficiryIOT == null || undefined ? "-1" : $scope.insertSelectedBeneficiryIOT;
+ 			
+ 			brqmulRoleobj.beneficiaryImt = obj["Beneficiary IMT"] = $scope.getDesToAddRecordGrid($scope.insertSelectedBeneficiaryIMT,$scope.multipleBeneficiaryIMT);
+ 			brqmulRoleobj.beneficiaryImtid = $scope.insertSelectedBeneficiaryIMT == null || undefined ? "-1" : $scope.insertSelectedBeneficiaryIMT;
+ 			
+ 			brqmulRoleobj.region = obj["Region"] = "-";
+ 			brqmulRoleobj.regionId = "-1";
+ 			brqmulRoleobj.beneficiaryCountry = obj["Beneficiary Country"] = $scope.getDesToAddRecordGrid($scope.insertSelectedBeneficiaryCountry,$scope.multipleBeneficiaryCountry);
+ 			brqmulRoleobj.beneficiaryCountryId = $scope.insertSelectedBeneficiaryCountry == "-" ? "-1" : $scope.insertSelectedBeneficiaryCountry;
+ 			
+ 			brqmulRoleobj.discipline = obj["Discipline"] = $scope.getDesToAddRecordGrid($scope.insertSelectedDiscipline,$scope.multipleDisciplineVertical);
+ 			brqmulRoleobj.disciplineId = $scope.insertSelectedDiscipline == "-" ? "-1" : $scope.insertSelectedDiscipline;
+ 			
+ 			brqmulRoleobj.jobrole = obj["Job Role"] = $scope.getDesToAddRecordGrid($scope.insertSelectedJobrole,$scope.multipleJobRole);
+ 			brqmulRoleobj.jobroleId = $scope.insertSelectedJobrole == "-" ? "-1" : $scope.insertSelectedJobrole;
+     		
+ 			brqmulRoleobj.jobrolespecialities = obj["Job Role Specialities"] = $scope.getDesToAddRecordGrid($scope.insertSelectedJobroeSpecialities,$scope.multipleJobroleSpecialities);
+ 			brqmulRoleobj.jobrolespecialitiesId = $scope.insertSelectedJobroeSpecialities == "-" ? "-1" : $scope.insertSelectedJobroeSpecialities;
+ 			
+ 			brqmulRoleobj.program = obj["Program"] = $scope.getDesToAddRecordGrid($scope.insertSelectedProgram,$scope.multipleprogram);
+ 			brqmulRoleobj.programId = $scope.insertSelectedProgram == "-" ? "-1" : $scope.insertSelectedProgram;
+ 			
+ 			brqmulRoleobj.fundinglevelBudgetDeployment = obj["Funding Level/Budget Deployment"] = $scope.getDesToAddRecordGrid($scope.insertSelectedFunBudDplmnt,$scope.multiplesFundingLevelBudgetDeployment);
+ 			brqmulRoleobj.fundinglevelBudgetDeploymentId = $scope.insertSelectedFunBudDplmnt == "-" ? "-1" : $scope.insertSelectedFunBudDplmnt;
+ 			
+ 			brqmulRoleobj.icafunded = obj["ICA Funded"] = $scope.getDesToAddRecordGrid($scope.insertSelectedIcafunded,$scope.multiplesIcaFunded);
+ 			brqmulRoleobj.icafundedId = $scope.insertSelectedIcafunded== "-" ? "-1" : $scope.insertSelectedIcafunded; 
+ 			
+ 			brqmulRoleobj.departureDate = $scope.insertSelectedDepDateFrmRole == " " || $scope.insertSelectedDepDateFrmRole == null || $scope.insertSelectedDepDateFrmRole == undefined ? "1/1/1990" : $scope.insertSelectedDepDateFrmRole;
+ 		    obj["Departure Date"] = $scope.insertSelectedDepDateFrmRole == " " || $scope.insertSelectedDepDateFrmRole == null || $scope.insertSelectedDepDateFrmRole == undefined ? "-" : $scope.insertSelectedDepDateFrmRole;
+ 			//brqmulRoleobj.departureDateVal = "-1";
+ 			//set jobrole id
+ 			//brqmulRoleobj.RSRC_BRND_VRTCL_MAP_ID = null;
+ 			
+ 			brqmulRoleobj.RSRC_BRND_VRTCL_MAP_ID = $('#addroleRecordOverlay #jobrole').val();
+ 			    		
+ 			brqmulRoleobj.isChecked = false;
+ 			
+     	//	$scope.brqmultiplegridoptions.data.push(obj);
+     		$scope.multiRoleAC.push(brqmulRoleobj);
+     		if (!$scope.$$phase) $scope.$apply(); 
+     		ibmweb.overlay.hide('addroleRecordOverlay', this);
+	        	return false;
+ 	   }else if($scope.mode == "edit"){
+ 		   var editedObj = {};
+ 		  editedObj.fteperrole = $scope.FTEPerRole;;
+ 		  editedObj.fundingBu = $scope.getDesToAddRecordGrid($scope.insertSelectedFundingBU,$scope.multiplesFundingBU);
+ 		  editedObj.fundingBuId = $scope.insertSelectedFundingBU == null || undefined ? "-1" : $scope.insertSelectedFundingBU;
+			
+ 		  editedObj.group  = "-";
+ 		  editedObj.groupId = "-1";
+			
+ 		  editedObj.beneficiarybu = $scope.getDesToAddRecordGrid($scope.insertSelectedBeneficiaryBU,$scope.multipleBeneficiaryBU);
+ 		  editedObj.beneficiarybuId = $scope.insertSelectedBeneficiaryBU == "-" ? "-1" : $scope.insertSelectedBeneficiaryBU;
+   		//obj["Beneficiary SubBrand"] = $scope.getDesToAddRecordGrid($scope.insertSelectedBeneficiaryBU,$scope.multipleBeneficiarySubBrand);
+   		
+ 		  editedObj.beneficiarySubBrand = $scope.getDesToAddRecordGrid($scope.insertSelectedBeneficiarySubBrand,$scope.multipleBeneficiarySubBrand);
+ 		  editedObj.beneficiarySubBrandId = $scope.insertSelectedBeneficiarySubBrand == "-" ? "-1" : $scope.insertSelectedBeneficiarySubBrand;
+			
+			//obj1.beneficiarySubBrand = obj["Beneficiary SubBrand"] = "-";
+   		//obj["Beneficiary SubBrand"] = $scope.getDesToAddRecordGrid("3230",$scope.multipleBeneficiarySubBrand);
+			
+     	  editedObj.mission = $scope.getDesToAddRecordGrid($scope.insertSelectedMission,$scope.multiplesMission);
+     	  editedObj.missionId = $scope.insertSelectedMission == "-" ? "-1" : $scope.insertSelectedMission;
+			
+ 		  editedObj.beneficiary = $scope.getDesToAddRecordGrid($scope.insertSelectedBeneficiary,$scope.newMultiplesBeneficiary);
+ 		  editedObj.beneficiaryId = $scope.insertSelectedBeneficiary == "-" ? "-1" : $scope.insertSelectedBeneficiary;
+			
+ 		  editedObj.beneficiaryIot = $scope.getDesToAddRecordGrid($scope.insertSelectedBeneficiryIOT,$scope.multipleBeneficiaryIOT);
+ 		  editedObj.beneficiaryIotId = $scope.insertSelectedBeneficiryIOT == null || undefined ? "-1" : $scope.insertSelectedBeneficiryIOT;
+			
+ 		  editedObj.beneficiaryImt = $scope.getDesToAddRecordGrid($scope.insertSelectedBeneficiaryIMT,$scope.multipleBeneficiaryIMT);
+ 		  editedObj.beneficiaryImtid = $scope.insertSelectedBeneficiaryIMT == null || undefined ? "-1" : $scope.insertSelectedBeneficiaryIMT;
+			
+ 		  editedObj.region = "-";
+ 		  editedObj.regionId = "-1";
+ 		  editedObj.beneficiaryCountry = $scope.getDesToAddRecordGrid($scope.insertSelectedBeneficiaryCountry,$scope.multipleBeneficiaryCountry);
+ 		  editedObj.beneficiaryCountryId = $scope.insertSelectedBeneficiaryCountry == "-" ? "-1" : $scope.insertSelectedBeneficiaryCountry;
+			
+ 		  editedObj.discipline = $scope.getDesToAddRecordGrid($scope.insertSelectedDiscipline,$scope.multipleDisciplineVertical);
+ 		  editedObj.disciplineId = $scope.insertSelectedDiscipline == "-" ? "-1" : $scope.insertSelectedDiscipline;
+			
+ 		  editedObj.jobrole = $scope.getDesToAddRecordGrid($scope.insertSelectedJobrole,$scope.multipleJobRole);
+ 		  editedObj.jobroleId = $scope.insertSelectedJobrole == "-" ? "-1" : $scope.insertSelectedJobrole;
+   		
+ 		  editedObj.jobrolespecialities = $scope.getDesToAddRecordGrid($scope.insertSelectedJobroeSpecialities,$scope.multipleJobroleSpecialities);
+ 		  editedObj.jobrolespecialitiesId = $scope.insertSelectedJobroeSpecialities == "-" ? "-1" : $scope.insertSelectedJobroeSpecialities;
+			
+ 		  editedObj.program = $scope.getDesToAddRecordGrid($scope.insertSelectedProgram,$scope.multipleprogram);
+ 		  editedObj.programId = $scope.insertSelectedProgram == "-" ? "-1" : $scope.insertSelectedProgram;
+			
+ 		  editedObj.fundinglevelBudgetDeployment = $scope.getDesToAddRecordGrid($scope.insertSelectedFunBudDplmnt,$scope.multiplesFundingLevelBudgetDeployment);
+ 		  editedObj.fundinglevelBudgetDeploymentId = $scope.insertSelectedFunBudDplmnt == "-" ? "-1" : $scope.insertSelectedFunBudDplmnt;
+			
+ 		  editedObj.icafunded = $scope.getDesToAddRecordGrid($scope.insertSelectedIcafunded,$scope.multiplesIcaFunded);
+ 		  editedObj.icafundedId = $scope.insertSelectedIcafunded== "-" ? "-1" : $scope.insertSelectedIcafunded; 
+ 		  
+ 		  editedObj.departureDate = $scope.insertSelectedDepDateFrmRole == " " || $scope.insertSelectedDepDateFrmRole == null || $scope.insertSelectedDepDateFrmRole == undefined ? "1/1/1990" : $scope.insertSelectedDepDateFrmRole;
+			
+			//set jobrole id
+ 		  editedObj.RSRC_BRND_VRTCL_MAP_ID = $scope.RSRC_BRND_VRTCL_MAP_ID;
+   		
+ 		editedObj.isChecked = false;
+ 		$scope.multiRoleAC.push(editedObj);
+ 		if (!$scope.$$phase) $scope.$apply(); 
+ 		ibmweb.overlay.hide('addroleRecordOverlay', this);
+        return false;
+ 		
+ 	   }	
+     };
+     /*
+      * BRQ single selection/copy - when click on delete button
+      */
+     $scope.deleteRecordFrmTable = function(){
+     	 console.log("delete record from grid");
+     	 /*var index = $scope.brqmultiplegridoptions.data.indexOf($scope.selectedMultipleRow);
+         $scope.brqmultiplegridoptions.data.splice(index, 1);
+         $scope.multiRoleAC.splice(index,1);*/
+     	 console.log("Before delete length..");
+     	 console.log($scope.multiRoleAC.length);
+     	 $("#saveBtn").attr("disabled", false);
+     	 var selectedRole = false;
+     	 $scope.index;
+     	 if($scope.multiRoleAC.length == 0){
+     		$scope.showAlert(APPCONSTANTS.NO_RECORD_TO_DELETE);
+     	 }
+         for(var i=0; i<$scope.multiRoleAC.length; i++){
+ 			   if($scope.multiRoleAC[i].isChecked == true){
+ 				  selectedRole = true; 
+ 				  $scope.index = i;
+ 			   }
+ 		 }
+         
+         if(selectedRole == false){
+        	$scope.showAlert(APPCONSTANTS.SELECT_RECORD_TO_DELETE);
+         }else{
+        	ibmweb.overlay.show('brqsingleEditDeleteConfrmOverlay',this);
+        	$scope.brqmultipleSecMsg = "Are u sure want to delete record?";
+         }
+     };
+     
+     $scope.brqMultipleYesBtn = function(){
+    	console.log("brqMultipleYesBtn");
+		$scope.multiRoleAC.splice($scope.index,1);
+      	ibmweb.overlay.hide('brqsingleEditDeleteConfrmOverlay',this);
+     };
+     
+     $scope.brqMultipleNoBtn = function(){
+    	console.log("brqMultipleNoBtn");
+       	ibmweb.overlay.hide('brqsingleEditDeleteConfrmOverlay',this);
+     };
+     
+     $scope.getDesToAddRecordGrid = function(lvid,arr){
+     	for(var i=0; i<arr.length; i++){
+     		if(arr[i].lv_id == lvid){
+     			return arr[i].lv_desc;
+     		}
+     	}
+     };
+     
+     $scope.getValueFromEditRecord = function(str,arr){
+     	for(var i=0; i<arr.length; i++){
+     		if(arr[i].lv_desc == str){
+     			return arr[i].lv_id;
+     		}
+     	}
+     };
+     
+     $scope.multpleBeneficiarySubBrandChangeEvent = function(){
+        	console.log("multpleBeneficiarySubBrandChangeEvent");
+     };
+     /*
+      * BRQ single selection/copy - when click on edit button
+      */
+     $scope.editRecord = function(){
+    	 console.log("edit record...");
+    	 $("#saveBtn").attr("disabled", false);
+    	 $scope.mode = "edit";
+    	 if($scope.multiRoleAC.length == 0){
+     		$scope.showAlert(APPCONSTANTS.NO_RECORD_TO_EDIT);
+     		return false;
+     	 }else if($scope.editableRowObj == undefined || $scope.editableRowObj == null){
+     		$scope.showAlert(APPCONSTANTS.SELECT_RECORD_TO_EDIT);
+     		return false;
+     	 }
+     	 $scope.FTEPerRole = $scope.editableRowObj.fteperrole;
+     	 //$scope.insertSelectedFundingBU = $scope.getValueFromEditRecord($scope.selectedMultipleRow["Funding BU"],$scope.multiplesFundingBU);
+     	 $scope.insertSelectedFundingBU = $scope.editableRowObj.fundingBuId;
+     	 $scope.fundingBUChangeEvent(true,'beneficiaryChangeEventCall');
+     	 //$scope.insertSelectedDepDateFrmRole
+     };
+     $scope.jobroleSpecialitiesFuncCall = function(){
+    	/* $scope.insertSelectedJobroeSpecialities = $scope.getValueFromEditRecord($scope.selectedMultipleRow["Job Role Specialities"],$scope.multipleJobroleSpecialities); 
+         $scope.insertSelectedProgram = $scope.getValueFromEditRecord($scope.selectedMultipleRow["Program"],$scope.multipleprogram); 
+         $scope.insertSelectedFunBudDplmnt = $scope.getValueFromEditRecord($scope.selectedMultipleRow["Funding Level/Budget Deployment"],$scope.multiplesFundingLevelBudgetDeployment); 
+         $scope.insertSelectedIcafunded = $scope.getValueFromEditRecord($scope.selectedMultipleRow["ICA Funded"],$scope.multiplesIcaFunded);*/
+         
+         $scope.insertSelectedJobroeSpecialities = $scope.editableRowObj.jobrolespecialitiesId;
+         $scope.insertSelectedProgram = $scope.editableRowObj.programId;
+         $scope.insertSelectedFunBudDplmnt = $scope.editableRowObj.fundinglevelBudgetDeploymentId;
+         $scope.insertSelectedIcafunded = $scope.editableRowObj.icafundedId;
+       
+         ibmweb.overlay.show('addroleRecordOverlay', this);
+         return false;
+     };
+     $scope.jobroleChangeEventCall = function(){
+      //  $scope.insertSelectedJobrole = $scope.getValueFromEditRecord($scope.selectedMultipleRow["Job Role"],$scope.multipleJobRole); 
+    	$scope.insertSelectedJobrole = $scope.editableRowObj.jobroleId;
+    	$scope.jobroleChangeEvent(true,'jobroleSpecialitiesFuncCall');
+     };
+     $scope.disciplineChangeEventCall = function(){
+    	 //   $scope.insertSelectedBeneficiaryCountry = $scope.getValueFromEditRecord($scope.selectedMultipleRow["Beneficiary Country"],$scope.multipleBeneficiaryCountry); 
+         //	$scope.insertSelectedDiscipline = $scope.getValueFromEditRecord($scope.selectedMultipleRow["Discipline"],$scope.multipleDisciplineVertical); 
+        	$scope.insertSelectedBeneficiaryCountry = $scope.editableRowObj.beneficiaryCountryId;
+        	$scope.insertSelectedDiscipline = $scope.editableRowObj.disciplineId;
+        	$scope.disciplineChangeEvent(true,'testFunc6');
+     };
+     $scope.regionDisciplineChangeEventCall = function(){
+    	  if($scope.insertSelectedRegion != null && $scope.insertSelectedRegion != "" && $scope.insertSelectedRegion != "-1"){
+        	  //  $scope.insertSelectedRegion = $scope.getValueFromEditRecord($scope.selectedMultipleRow["Region"],$scope.multipleRegion); 
+    		  $scope.insertSelectedRegion = $scope.editableRowObj.regionId;
+    		  $scope.regionChangeEvent(true, 'disciplineChangeEventCall');
+          }else{
+	           // $scope.insertSelectedBeneficiaryCountry = $scope.getValueFromEditRecord($scope.selectedMultipleRow["Beneficiary Country"],$scope.multipleBeneficiaryCountry); 
+		       // $scope.insertSelectedDiscipline = $scope.getValueFromEditRecord($scope.selectedMultipleRow["Discipline"],$scope.multipleDisciplineVertical); 
+		        $scope.insertSelectedBeneficiaryCountry = $scope.editableRowObj.beneficiaryCountryId;
+		        $scope.insertSelectedDiscipline = $scope.editableRowObj.disciplineId;
+		        $scope.disciplineChangeEvent(true,'jobroleChangeEventCall');
+          }
+     };
+     $scope.beneficiaryIMTChangeEventCall = function(){
+          // $scope.insertSelectedBeneficiaryIMT = $scope.getValueFromEditRecord($scope.selectedMultipleRow["Beneficiary IMT"],$scope.multipleBeneficiaryIMT); 
+    	   $scope.insertSelectedBeneficiaryIMT = $scope.editableRowObj.beneficiaryImtid;
+    	   $scope.benecifiaryIMTChangeEvent(true,'regionDisciplineChangeEventCall');
+     };
+     $scope.beneficiaryIOTChangeEventCall = function(){
+		   // $scope.insertSelectedBeneficiary = $scope.getValueFromEditRecord($scope.selectedMultipleRow["Beneficiary"],$scope.newMultiplesBeneficiary);
+		    //$scope.insertSelectedBeneficiryIOT = $scope.getValueFromEditRecord($scope.selectedMultipleRow["Beneficiary IOT"],$scope.multipleBeneficiaryIOT); 
+        $scope.insertSelectedBeneficiary = $scope.editableRowObj.beneficiaryId;
+        $scope.insertSelectedBeneficiryIOT = $scope.editableRowObj.beneficiaryIotId;
+        $scope.benecifiaryIOTChangeEvent(true,'beneficiaryIMTChangeEventCall');
+     };
+      $scope.missionChangeEventCall = function(){
+	       // $scope.insertSelectedBeneficiarySubBrand = $scope.getValueFromEditRecord($scope.selectedMultipleRow["Beneficiary SubBrand"],$scope.multipleBeneficiarySubBrand);
+	        $scope.insertSelectedBeneficiarySubBrand = $scope.editableRowObj.beneficiarySubBrandId;
+	        $scope.multpleBeneficiarySubBrandChangeEvent();
+	       // $scope.insertSelectedMission = $scope.getValueFromEditRecord($scope.selectedMultipleRow["Mission"],$scope.multiplesMission);
+	        $scope.insertSelectedMission = $scope.editableRowObj.missionId;
+	        $scope.missionChangeEvent(true,'beneficiaryIOTChangeEventCall');
+      };
+     $scope.beneficiaryChangeEventCall = function(){
+    	 //$scope.insertSelectedBeneficiaryBU = $scope.getValueFromEditRecord($scope.selectedMultipleRow["Beneficiary BU"],$scope.multipleBeneficiaryBU);
+    	 $scope.insertSelectedBeneficiaryBU = $scope.editableRowObj.beneficiarybuId;
+    	 $scope.beneficiaryBUChangeEvent(true,'missionChangeEventCall');
+     };
+     $scope.showalertClose = function(){
+    	 ibmweb.overlay.hide('showalertbrq', this);
+     };
+     $scope.functmgrColse = function(){
+    	 ibmweb.overlay.hide('functioanlmgr-overlay1', this); 
+     };
+     
+     $scope.editableRowObj;
+     /*
+      * BRQ single selection/copy - multiple section checkbox click
+      */
+     $scope.markSelected = function(rowData){
+    	 console.log("mark selected"); 
+    	 var rowCheck = rowData.isChecked;
+    	 if(rowCheck){
+        	 for(var i=0; i<$scope.multiRoleAC.length; i++){
+        		 $scope.multiRoleAC[i].isChecked = false;
+        	 }
+    	 }
+    	 rowData.isChecked = rowCheck;
+    	 if(rowData.isChecked){
+    		 $scope.editableRowObj = rowData;
+    	 }else{
+    		 $scope.editableRowObj = null;
+    	 }
+     };
+     /*
+      * BRQ single selection/copy - physical iot dropdown change event
+      */
+     $scope.hriwphysicalIotChange = function(){
+    	console.log("hriw physical iot change..."); 
+    	$("#loader").css("display","block");
+    	$("#saveBtn").attr("disabled", false);
+    	var id = $scope.hriwPhysicalLocIot;
+    	$http.post('./sendflexrequest?action=3rdQuadrant&servletAction=retrieveNextLevel&id='+id+"&doCompress=false").success(function(data, status, headers, config) {
+    		$scope.physicalimts = $scope.brqDropdownSet(data.nextLevel);
+    		$("#loader").css("display","none");
+        }).error(function(data, status, headers, config) {
+				 $("#loader").css("display","none");
+	   });
+     };
+     /*
+      * BRQ single selection/copy - physical imt dropdown change event
+      */
+     $scope.hriwPhysicalLocIMT = function(){
+    	console.log("hriw physical imt change"); 
+    	$("#loader").css("display","block");
+    	$("#saveBtn").attr("disabled", false);
+    	var id = $scope.hriwphysicalLocImt;
+    	$http.post('./sendflexrequest?action=3rdQuadrant&servletAction=retrieveNextLevel&id='+id+"&doCompress=false").success(function(data, status, headers, config) {
+    		$scope.countries = $scope.brqDropdownSet(data.nextLevel);
+    		$("#loader").css("display","none");
+        }).error(function(data, status, headers, config) {
+				 $("#loader").css("display","none");
+	   });
+     };
+     // set Is Exec and Is TL value based on the selection
+     $scope.isManagerChangeHandler = function(){
+    	console.log("ismanager change handler");
+    	$("#saveBtn").attr("disabled", false);
+    	if($('#brq_is-manager :selected').val() == "386"){
+    		$scope.selectedTl = "";
+    		$('#brq_istl').val = "";
+    		$scope.selectedExec = "3462";
+    		$('#brq_isexec').val = "3462";
+    	}else if($('#brq_is-manager :selected').val() == "385"){
+    		$scope.selectedExec = "";
+    		$('#brq_isexec').val = "";
+    		$scope.selectedTl = "3464";
+    		$('#brq_istl').val = "3464";
+    	}
+     };
+     //to set default value based on the selection
+     $scope.execChangeHandler = function(){
+    	 console.log("execChangeHandler");
+    	 $("#saveBtn").attr("disabled", false);
+    	 if($('#brq_isexec :selected').text() == "Yes"){
+    		 if($('#brq_is-manager :selected').text() == "Non-Mgr") {
+					$scope.showAlert(APPCONSTANTS.IS_EXEC_YES_VALUE);
+					$scope.selectedExec = "3462";
+	        		$('#brq_isexec').val = "3462";
+				} else if ($('#brq_is-manager :selected').val() == "386") {
+					$scope.showAlert(APPCONSTANTS.IS_EXEC_YES_VALUE);
+					$scope.selectedExec = "3462";
+	        		$('#brq_isexec').val = "3462";
+					
+				} else {
+					$scope.selectedTl = "3464";
+					$('#brq_istl').val = "3464";
+				}
+    	 }
+     };
+     // Is TL dropdown change event
+     $scope.tlChangeHandler = function(){
+    	console.log("tl change handler..."); 
+    	$("#saveBtn").attr("disabled", false);
+    	if($('#brq_istl :selected').text() == "Yes"){
+			if ($('#brq_is-manager :selected').text() == "Mgr") {
+				$scope.showAlert(APPCONSTANTS.IS_TL_YES_VALUE);
+				$scope.selectedTl = "3464";
+				$('#brq_istl').val = "3464";
+			} else if ($('#brq_is-manager :selected').val() == "385") {
+				$scope.showAlert(APPCONSTANTS.IS_TL_YES_VALUE);
+				$scope.selectedTl = "3464";
+				$('#brq_istl').val = "3464";
+			} else {
+				$scope.selectedExec = "3462";
+        		$('#brq_isexec').val = "3462";
+			}
+		}
+     };
+     // push the dropdown values to an aray
+     $scope.brqDropdownSet = function(dropdownArr){
+    	 var objArr = [];
+    	 for(var i=0; i<dropdownArr.length; i++){
+    		 var obj = {};
+    		 obj.lv_id = dropdownArr[i].lv_id;
+    		 obj.lv_desc = dropdownArr[i].lv_desc;
+    		 obj.lm_id = dropdownArr[i].lm_id;
+    		 obj.lv_code = dropdownArr[i].lv_code;
+    		 obj.lv_pkey = dropdownArr[i].lv_pkey;
+    		 objArr.push(obj);
+    	 }
+    	 return objArr;
+    };
+    // get employee type description
+    $scope.getEmpType = function(resourcetype){
+    	for(var i=0; i<$scope.empType.length; i++){
+    		if($scope.empType[i].lv_id == resourcetype){
+    			return $scope.empType[i].lv_desc;
+    		}
+    	}
+    };
+    // get physical iot description
+    $scope.getPhysicalLocIOT = function(physicaliot){
+    	for(var i=0; i<$scope.phylocIot.length; i++){
+    		if($scope.phylocIot[i].lv_id == physicaliot){
+    			return $scope.phylocIot[i].lv_desc;
+    		}
+    	}
+    };
+    // get physical location imt by passing physicalimt id
+    $scope.physicalLocIMTs = function(physicaliot,physicalimtid){
+    	    var imtReq = {
+	    			    method: 'POST',
+	    			    url: './sendflexrequest?action=3rdQuadrant&servletAction=retrieveNextLevel&id='+physicaliot+'&doCompress=false',
+	    			    headers: {
+	    			        'Content-Type': 'application/json'
+	    			    },
+	    			    'dataType': 'json'
+	               };
+		        	$http(imtReq).then(function (response) {
+					    console.log("physical location imt");
+					    console.log(response);
+					    $scope.physicalimts = response.data.nextLevel;
+					    $scope.getphysicalLocIMT($scope.physicalimts,physicalimtid);
+					}, function (response) {
+						console.log("imt failure function...");
+					});
+    };
+    
+    $scope.getphysicalLocIMT = function(physicalimts,physicalimtid){
+    	for(var i=0; i<physicalimts.length; i++){
+    		if(physicalimts[i].lv_id == physicalimtid){
+    			$scope.physicalLocationIMT = physicalimts[i].lv_desc;
+    		}
+    	}
+    };
+    // load country of residence from physical imt
+    $scope.loadCountrResdatafromPhyIMT = function(physicalImtId,physicalcountrynum){
+    	var countryReq = {
+			    method: 'POST',
+			    url: './sendflexrequest?action=3rdQuadrant&servletAction=retrieveNextLevel&id='+physicalImtId+'&doCompress=false',
+			    headers: {
+			        'Content-Type': 'application/json'
+			    },
+			    'dataType': 'json'
+           };
+        	$http(countryReq).then(function (response) {
+			    console.log("country list");
+			    console.log(response);
+			    $scope.countries = response.data.nextLevel;
+			    $scope.getcountryOfResidence($scope.countries,physicalcountrynum);
+			}, function (response) {
+				console.log("imt failure function...");
+			});
+    };
+    // get country of residecne
+    $scope.getcountryOfResidence = function(countrieslist,countrynum){
+    	for(var i=0; i<countrieslist.length; i++){
+    		if(countrieslist[i].lv_id == countrynum){
+    			$scope.countryOfResidence = countrieslist[i].lv_desc;
+    		}
+    	}
+    };
+    
+    /*
+     *  This is the function to display multiple section 
+     */
+    $scope.multipleSectionGrid  = function(rsrcbrandvrtclArr){
+    //	$scope.brqmultiplegridoptions.columnDefs = [];
+    	$scope.multiRoleAC = [];
+    	var brqMultiSecHeaderArr = ["FTE PerRole","Funding BU","Group","Beneficiary BU","Beneficiary SubBrand","Mission","Beneficiary","Beneficiary IOT","Beneficiary IMT","Region","Beneficiary Country","Discipline","Job Role","Job Role Specialities","Program","Funding Level/Budget Deployment","ICA Funded","Departure Date"];
+    	$scope.brqMultiSecHeaderArr = ["FTE PerRole","Funding BU","Group","Beneficiary BU","Beneficiary SubBrand","Mission","Beneficiary","Beneficiary IOT","Beneficiary IMT","Region","Beneficiary Country","Discipline","Job Role","Job Role Specialities","Program","Funding Level/Budget Deployment","ICA Funded","Departure Date"];
+    	
+    	var multipleDataArr = [];
+    	$scope.multipleSecDataArr = [];
+    	
+    	for(var i=0; i<rsrcbrandvrtclArr.length; i++){
+    		var obj = {};
+    		var obj1 = {};
+    		obj["FTE PerRole"] = rsrcbrandvrtclArr[i].ACTUAL;
+    		obj1.fteperrole = rsrcbrandvrtclArr[i].ACTUAL;
+    		
+    		var fundingBuValues = rsrcbrandvrtclArr[i].brandMap.FUNDING_BU.split("^");
+    		var groupValues = rsrcbrandvrtclArr[i].brandMap.GROUP.split("^");
+    		var beneficiaryBuValues = rsrcbrandvrtclArr[i].brandMap.SUB_BRAND_1.split("^");
+    		var beneficiarySubBrandValues = rsrcbrandvrtclArr[i].brandMap.SUB_BRAND_2.split("^");
+    		var missionValues = rsrcbrandvrtclArr[i].LV_MISSION.split("^");
+    		var beneficiary = rsrcbrandvrtclArr[i].beneficiaryMap.BENEFICIARY.split("^");
+    		var beneficiaryIot = rsrcbrandvrtclArr[i].beneficiaryMap.BENEFICIARY_IOT.split("^");
+    		var beneficiaryImt = rsrcbrandvrtclArr[i].beneficiaryMap.BENEFICIARY_IMT.split("^");
+    		var region = rsrcbrandvrtclArr[i].beneficiaryMap.BENEFICIARY_GMR.split("^");
+    		var beneficiaryCountry = rsrcbrandvrtclArr[i].beneficiaryMap.BENEFICIARY_COUNTRY.split("^");
+    		var discipline = rsrcbrandvrtclArr[i].jobRoleMap.LV_VERTICAL.split("^");
+    		var jobrole = rsrcbrandvrtclArr[i].jobRoleMap.LV_JOB_ROLE_SUB_VERTICAL.split("^");
+    		var jobroleSpecialities = rsrcbrandvrtclArr[i].jobRoleMap.LV_JOB_ROLE_SPECIALTIES.split("^");
+    		var program = rsrcbrandvrtclArr[i].LV_CATEGORY.split("^");
+    		var fundingLevelBudgetDeployment = rsrcbrandvrtclArr[i].FUNDING_LEVEL_BUDGET_DEPLOYMENT.split("^");
+    		var icaFunded = rsrcbrandvrtclArr[i].ICA_FUNDED.split("^");
+    		
+    		obj["Funding BU"] = $scope.fundingBu = fundingBuValues[1];
+    		
+    		obj1.fundingBu = fundingBuValues[1];
+    		obj1.fundingBuId = fundingBuValues[0];
+    		
+    		obj["Group"] = groupValues[1] == "null" ? "-" : groupValues[1];
+    		
+    		obj1.group = groupValues[1] == "null" ? "-" : groupValues[1];
+    		obj1.groupId = groupValues[0] == "-" ? "-1" : groupValues[0];
+    		
+    		obj["Beneficiary BU"] = beneficiaryBuValues[1] == "null" ? "-" : beneficiaryBuValues[1];
+    		obj1.beneficiarybu = beneficiaryBuValues[1] == "null" ? "-" : beneficiaryBuValues[1];
+    		obj1.beneficiarybuId = beneficiaryBuValues[0] == "-" ? "-1" : beneficiaryBuValues[0];
+    		
+    		obj["Beneficiary SubBrand"] = beneficiarySubBrandValues[1] == "null" ? "-" : beneficiarySubBrandValues[1];
+    		obj1.beneficiarySubBrand = beneficiarySubBrandValues[1] == "null" ? "-" : beneficiarySubBrandValues[1];
+    		obj1.beneficiarySubBrandId = beneficiarySubBrandValues[0] == "-" ? "-1" : beneficiarySubBrandValues[0];
+    		
+    		obj["Mission"] = missionValues[1] == "null" ? "-" : missionValues[1];
+    		obj1.mission = missionValues[1] == "null" ? "-" : missionValues[1];
+    		obj1.missionId = missionValues[0] == "-" ? "-1" : missionValues[0];
+    		
+    		obj["Beneficiary"] = beneficiary[1] == "null" ? "-" : beneficiary[1];
+    		obj1.beneficiary = beneficiary[1] == "null" ? "-" : beneficiary[1];
+    		obj1.beneficiaryId = beneficiary[0] == "-" ? "-1" : beneficiary[0];
+    		
+    		obj["Beneficiary IOT"] = beneficiaryIot[1] == "null" ? "-" : beneficiaryIot[1];
+    		obj1.beneficiaryIot = beneficiaryIot[1] == "null" ? "-" : beneficiaryIot[1];
+    		obj1.beneficiaryIotId = beneficiaryIot[0] == "-" ? "-1" : beneficiaryIot[0];
+    		
+    		obj["Beneficiary IMT"] = beneficiaryImt[1] == "null" ? "-" : beneficiaryImt[1];
+    		obj1.beneficiaryImt = beneficiaryImt[1] == "null" ? "-" : beneficiaryImt[1];
+    		obj1.beneficiaryImtid = beneficiaryImt[0] == "-" ? "-1" : beneficiaryImt[0];
+    		
+    		obj["Region"] = region[1] == "null" ? "-" : region[1];
+    		obj1.region = region[1] == "null" ? "-" : region[1];
+    		obj1.regionId = region[0] == "-" ? "-1" : region[0];
+    		
+    		obj["Beneficiary Country"] = beneficiaryCountry[1] == "null" ? "-" : beneficiaryCountry[1];
+    		obj1.beneficiaryCountry = beneficiaryCountry[1] == "null" ? "-" : beneficiaryCountry[1];
+    		obj1.beneficiaryCountryId = beneficiaryCountry[0] == "-" ? "-1" : beneficiaryCountry[0];
+    		
+    		obj["Discipline"] = discipline[1] == "null" ? "-" : discipline[1];
+    		obj1.discipline = discipline[1] == "null" ? "-" : discipline[1];
+    		obj1.disciplineId = discipline[0] == "-" ? "-1" : discipline[0];
+    		
+    		obj["Job Role"] = jobrole[1] == "null" ? "-" : jobrole[1];
+    		obj1.jobrole = jobrole[1] == "null" ? "-" : jobrole[1];
+    		obj1.jobroleId = jobrole[0] == "-" ? "-1" : jobrole[0];
+    		
+    		obj["Job Role Specialities"] = jobroleSpecialities[1] == "null" ? "-" : jobroleSpecialities[1];
+    		obj1.jobrolespecialities = jobroleSpecialities[1] == "null" ? "-" : jobroleSpecialities[1];
+    		obj1.jobrolespecialitiesId = jobroleSpecialities[0] == "-" ? "-1" : jobroleSpecialities[0];
+    		
+    		obj["Program"] = program[1] == "null" ? "-" : program[1];
+    		obj1.program = program[1] == "null" ? "-" : program[1];
+    		obj1.programId = program[0] == "-" ? "-1" : program[0];
+    		
+    		obj["Funding Level/Budget Deployment"] = fundingLevelBudgetDeployment[1] == "null" ? "-" : fundingLevelBudgetDeployment[1];
+    		obj1.fundinglevelBudgetDeployment = fundingLevelBudgetDeployment[1] == "null" ? "-" : fundingLevelBudgetDeployment[1];
+    		obj1.fundinglevelBudgetDeploymentId = fundingLevelBudgetDeployment[0] == "-" ? "-1" : fundingLevelBudgetDeployment[0];
+    		
+    		obj["ICA Funded"] = icaFunded[1] == "null" ? "-" : icaFunded[1];
+    		obj1.icafunded = icaFunded[1] == "null" ? "-" : icaFunded[1];
+    		obj1.icafundedId = icaFunded[0] == "-" ? "-1" : icaFunded[0];
+    		
+    		obj["Departure Date"] = "-";
+    		obj1.departureDate = "-";
+    		//obj1.departureDateVal = "-1";
+    		obj1.RSRC_BRND_VRTCL_MAP_ID = rsrcbrandvrtclArr[i].RSRC_BRND_VRTCL_MAP_ID;
+    		
+    		obj1.isChecked = false;
+    		
+    		multipleDataArr.push(obj);
+    		$scope.multiRoleAC.push(obj1);
+    		$scope.multipleSecDataArr.push(obj1);
+    	}
+    //	$scope.brqmultiplegridoptions.data = multipleDataArr;
+    };
+    
+    $scope.getRequiredClass = function(updatedModel){
+    	if (updatedModel == "" || updatedModel ==  null) {
+    		return 'ibm-required';
+        } else {
+        	return 'blue-required';
+        }
+    };
+    // Func to call when click on departure date text box 
+    $scope.showDepDate = function(){
+    	console.log("showEnd date function");
+    	$('#datepicker').datepicker();
+	    if (!$scope.$$phase) $scope.$apply();
+	   };
+	   // Func to call when click on Date on this role textbox
+	   $scope.showDateRole = function(){
+		   console.log("show date role...");
+		   $('#date_role').datepicker();
+		   if (!$scope.$$phase) $scope.$apply();
+	   };
+	   // Function to enable save button
+	   $scope.enableSaveBtn = function(){
+		   console.log("enable save button");
+		   $("#saveBtn").attr("disabled", false);
+	   };
+	   
+	 } 
+  ]);
+});
+
+
